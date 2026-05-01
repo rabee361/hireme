@@ -1,0 +1,1 @@
+Laravel 12 API/web app on Windows using PHP 8.2, Vite, Tailwind 4, and php-open-source-saver/jwt-auth for API auth. Domain models include users typed by enum (student/customer/company/admin), ads, projects, notifications, and applications. API routes currently live in routes/api.php; auth endpoints return JSON with message/data structure.

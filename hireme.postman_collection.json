@@ -1,0 +1,607 @@
+{
+    "info": {
+        "_postman_id": "8a28ae34-7f4b-4ce8-bb08-d42f4d2f8a20",
+        "name": "HireMe API",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": "Postman collection for the HireMe API endpoints implemented so far. Current scope: JWT auth and OTP flows under /api/auth plus CRUD endpoints for ads and projects."
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://127.0.0.1:8000"
+        },
+        {
+            "key": "access_token",
+            "value": ""
+        },
+        {
+            "key": "refresh_token",
+            "value": ""
+        },
+        {
+            "key": "reset_token",
+            "value": ""
+        },
+        {
+            "key": "signup_email",
+            "value": "user@example.com"
+        },
+        {
+            "key": "signup_password",
+            "value": "Password123!"
+        },
+        {
+            "key": "otp_code",
+            "value": "ABC123"
+        },
+        {
+            "key": "ad_id",
+            "value": "1"
+        },
+        {
+            "key": "project_id",
+            "value": "1"
+        }
+    ],
+    "item": [
+        {
+            "name": "Auth",
+            "item": [
+                {
+                    "name": "Signup",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"username\": \"newuser\",\n    \"email\": \"{{signup_email}}\",\n    \"password\": \"{{signup_password}}\",\n    \"password_confirmation\": \"{{signup_password}}\",\n    \"user_type\": \"student\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/signup",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "signup"
+                            ]
+                        },
+                        "description": "Creates a new unverified user and sends a signup OTP to the provided email. user_type must be customer, student, or company."
+                    }
+                },
+                {
+                    "name": "Verify OTP (Signup)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"{{signup_email}}\",\n    \"code\": \"{{otp_code}}\",\n    \"type\": \"signup\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/verify-otp",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "verify-otp"
+                            ]
+                        },
+                        "description": "Verifies a signup OTP and marks the user's email as verified."
+                    }
+                },
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"{{signup_email}}\",\n    \"password\": \"{{signup_password}}\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "description": "Authenticates a verified user and returns access and refresh JWTs."
+                    }
+                },
+                {
+                    "name": "Refresh Token",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"refresh_token\": \"{{refresh_token}}\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/refresh",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "refresh"
+                            ]
+                        },
+                        "description": "Rotates the refresh token and returns a new access and refresh token pair."
+                    }
+                },
+                {
+                    "name": "Logout",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/logout",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "logout"
+                            ]
+                        },
+                        "description": "Revokes all user tokens by incrementing token_version. Requires a valid access token."
+                    }
+                },
+                {
+                    "name": "Send Password OTP",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"{{signup_email}}\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/send-email",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "send-email"
+                            ]
+                        },
+                        "description": "If the email exists, sends a password reset OTP. The response is intentionally generic."
+                    }
+                },
+                {
+                    "name": "Verify OTP (Password Reset)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"{{signup_email}}\",\n    \"code\": \"{{otp_code}}\",\n    \"type\": \"password_reset\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/verify-otp",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "verify-otp"
+                            ]
+                        },
+                        "description": "Verifies a password reset OTP and returns a reset_token for the change-password step."
+                    }
+                },
+                {
+                    "name": "Change Password",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"{{signup_email}}\",\n    \"token\": \"{{reset_token}}\",\n    \"password\": \"NewPassword123!\",\n    \"password_confirmation\": \"NewPassword123!\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/change-password",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "change-password"
+                            ]
+                        },
+                        "description": "Resets the password using the reset_token returned by the password_reset OTP verification step."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Ads",
+            "item": [
+                {
+                    "name": "List Ads",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/ads",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "ads"
+                            ]
+                        },
+                        "description": "Returns all ads with applicants_count, company name/description/image, and a dynamic since field. Public endpoint."
+                    }
+                },
+                {
+                    "name": "Show Ad",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/ads/{{ad_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "ads",
+                                "{{ad_id}}"
+                            ]
+                        },
+                        "description": "Returns a single ad with applicants_count, company name/description/image, and a dynamic since field. Public endpoint."
+                    }
+                },
+                {
+                    "name": "Create Ad",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"job_name\": \"Backend Engineer\",\n    \"req1\": \"Laravel\",\n    \"req2\": \"REST APIs\",\n    \"task1\": \"Build backend services\",\n    \"task2\": \"Write tests\",\n    \"feature1\": \"Health insurance\",\n    \"feature2\": \"Remote work\",\n    \"additional_details\": \"Experience with queues is a plus.\",\n    \"github_required\": true,\n    \"resume_required\": true,\n    \"prev_work_required\": false,\n    \"expected_salary_required\": true\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/ads",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "ads"
+                            ]
+                        },
+                        "description": "Creates a new ad for the authenticated company user. Requires a valid access token for a company account."
+                    }
+                },
+                {
+                    "name": "Update Ad",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"job_name\": \"Senior Backend Engineer\",\n    \"feature1\": \"Medical insurance\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/ads/{{ad_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "ads",
+                                "{{ad_id}}"
+                            ]
+                        },
+                        "description": "Updates an existing ad owned by the authenticated company user. Partial updates are allowed."
+                    }
+                },
+                {
+                    "name": "Delete Ad",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/ads/{{ad_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "ads",
+                                "{{ad_id}}"
+                            ]
+                        },
+                        "description": "Deletes an ad owned by the authenticated company user."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Projects",
+            "item": [
+                {
+                    "name": "List Projects",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/projects",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "projects"
+                            ]
+                        },
+                        "description": "Returns all projects with applicants_count, customer name/description/image, and a dynamic since field. Public endpoint."
+                    }
+                },
+                {
+                    "name": "Show Project",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/projects/{{project_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "projects",
+                                "{{project_id}}"
+                            ]
+                        },
+                        "description": "Returns a single project with applicants_count, customer name/description/image, and a dynamic since field. Public endpoint."
+                    }
+                },
+                {
+                    "name": "Create Project",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Analytics Portal\",\n    \"details\": \"Build an internal analytics portal.\",\n    \"tool1\": \"Laravel\",\n    \"tool2\": \"React\",\n    \"tool3\": \"PostgreSQL\",\n    \"tool4\": \"Redis\",\n    \"tool5\": \"Docker\",\n    \"cover_image\": \"projects/analytics.png\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/projects",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "projects"
+                            ]
+                        },
+                        "description": "Creates a new project for the authenticated customer user. Requires a valid access token for a customer account."
+                    }
+                },
+                {
+                    "name": "Update Project",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Advanced Analytics Portal\",\n    \"cover_image\": \"projects/advanced-analytics.png\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/projects/{{project_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "projects",
+                                "{{project_id}}"
+                            ]
+                        },
+                        "description": "Updates an existing project owned by the authenticated customer user. Partial updates are allowed."
+                    }
+                },
+                {
+                    "name": "Delete Project",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/projects/{{project_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "projects",
+                                "{{project_id}}"
+                            ]
+                        },
+                        "description": "Deletes a project owned by the authenticated customer user."
+                    }
+                }
+            ]
+        }
+    ]
+}
