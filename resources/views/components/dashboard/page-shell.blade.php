@@ -14,7 +14,7 @@
 
     <section class="dashboard-panel overflow-hidden">
         @isset($toolbar)
-            <div class="border-b border-brand-100/80 px-5 py-4 sm:px-6">
+            <div class="border-b border-brand-100/80 px-5 py-4 sm:px-6 dark:border-zinc-800">
                 {{ $toolbar }}
             </div>
         @endisset

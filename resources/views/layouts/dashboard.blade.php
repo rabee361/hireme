@@ -11,9 +11,10 @@
             <div class="relative flex min-h-screen flex-col lg:flex-row-reverse">
                 <x-dashboard.sidebar />
 
-                <div class="flex min-h-screen min-w-0 flex-1 flex-col lg:ps-2 lg:pt-6">
+                <div class="flex min-h-screen min-w-0 flex-1 flex-col lg:ps-2">
+                    <x-dashboard.topbar />
 
-                    <main class="flex-1 px-4 pb-6 pt-2 sm:px-6 lg:px-10 lg:pb-10 lg:pt-6">
+                    <main class="flex-1 px-4 pb-6 pt-2 sm:px-6 lg:px-10 lg:pb-10 lg:pt-0">
                         {{ $slot }}
                     </main>
                 </div>

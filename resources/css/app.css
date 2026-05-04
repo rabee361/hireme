@@ -67,12 +67,26 @@
             linear-gradient(180deg, #f8fcfa 0%, #eef8f3 100%);
     }
 
+    .dark .dashboard-shell {
+        background:
+            radial-gradient(circle at top right, rgba(20, 83, 45, 0.15), transparent 25rem),
+            radial-gradient(circle at bottom left, rgba(6, 78, 59, 0.1), transparent 25rem),
+            #0a0a0a;
+    }
+
     .dashboard-grid {
         background-image:
             linear-gradient(rgba(21, 152, 104, 0.05) 1px, transparent 1px),
             linear-gradient(90deg, rgba(21, 152, 104, 0.05) 1px, transparent 1px);
         background-size: 32px 32px;
         mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.2));
+    }
+
+    .dark .dashboard-grid {
+        background-image:
+            linear-gradient(rgba(21, 152, 104, 0.08) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(21, 152, 104, 0.08) 1px, transparent 1px);
+        mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.3));
     }
 
     .dashboard-panel {
@@ -84,16 +98,26 @@
         border-radius: 28px;
     }
 
+    .dark .dashboard-panel {
+        border-color: rgba(64, 64, 64, 0.4);
+        background: rgba(23, 23, 23, 0.8);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+    }
+
     .dashboard-soft {
         background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(222, 248, 238, 0.94) 45%, rgba(185, 240, 216, 0.86) 100%);
     }
 
+    .dark .dashboard-soft {
+        background: linear-gradient(135deg, rgba(38, 38, 38, 0.9) 0%, rgba(21, 64, 48, 0.8) 100%);
+    }
+
     .dashboard-badge {
-        @apply inline-flex items-center gap-2 rounded-full border border-brand-100 bg-white/90 px-3 py-1 text-xs font-bold text-brand-700;
+        @apply inline-flex items-center gap-2 rounded-full border border-brand-100 bg-white/90 px-3 py-1 text-xs font-bold text-brand-700 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-zinc-300;
     }
 
     .dashboard-input {
-        @apply w-full rounded-2xl border border-brand-100 bg-white/92 px-4 py-3 text-sm text-zinc-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none transition focus:border-brand-300 focus:ring-4 focus:ring-brand-100/80;
+        @apply w-full rounded-2xl border border-brand-100 bg-white/92 px-4 py-3 text-sm text-zinc-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none transition focus:border-brand-300 focus:ring-4 focus:ring-brand-100/80 dark:border-zinc-800 dark:bg-zinc-950/80 dark:text-zinc-300 dark:shadow-none dark:focus:border-brand-500/50 dark:focus:ring-brand-500/20;
     }
 
     .dashboard-table th {
