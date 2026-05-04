@@ -29,6 +29,7 @@ class UserFactory extends Factory
             'type' => UserType::Customer->value,
             'username' => fake()->unique()->userName(),
             'email' => fake()->unique()->safeEmail(),
+            'is_verified' => true,
             'phone_number' => null,
             'description' => null,
             'cover_image' => null,
@@ -77,6 +78,7 @@ class UserFactory extends Factory
     public function unverified(): static
     {
         return $this->state(fn (array $attributes) => [
+            'is_verified' => false,
             'email_verified_at' => null,
         ]);
     }

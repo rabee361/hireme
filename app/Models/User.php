@@ -27,6 +27,7 @@ class User extends Authenticatable implements JWTSubject
         'type',
         'username',
         'email',
+        'is_verified',
         'phone_number',
         'description',
         'cover_image',
@@ -51,6 +52,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return [
             'type' => UserType::class,
+            'is_verified' => 'boolean',
             'token_version' => 'integer',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',

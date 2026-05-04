@@ -3,7 +3,7 @@
         "_postman_id": "8a28ae34-7f4b-4ce8-bb08-d42f4d2f8a20",
         "name": "HireMe API",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-        "description": "Postman collection for the HireMe API endpoints implemented so far. Current scope: JWT auth and OTP flows under /api/auth plus CRUD endpoints for ads and projects."
+        "description": "Postman collection for the HireMe API endpoints implemented so far. Current scope: the JWT auth and OTP flows under /api/auth plus CRUD endpoints for ads and projects from routes/api.php, with saved example responses for each endpoint."
     },
     "variable": [
         {
@@ -12,15 +12,18 @@
         },
         {
             "key": "access_token",
-            "value": ""
+            "value": "",
+            "description": "Generic bearer token for auth/logout requests."
         },
         {
             "key": "refresh_token",
-            "value": ""
+            "value": "",
+            "description": "Refresh token returned by login or refresh."
         },
         {
             "key": "reset_token",
-            "value": ""
+            "value": "",
+            "description": "Password reset token returned by Verify OTP (Password Reset)."
         },
         {
             "key": "signup_email",
@@ -29,6 +32,16 @@
         {
             "key": "signup_password",
             "value": "Password123!"
+        },
+        {
+            "key": "company_access_token",
+            "value": "",
+            "description": "Bearer token from a verified company login, used by ad write endpoints."
+        },
+        {
+            "key": "customer_access_token",
+            "value": "",
+            "description": "Bearer token from a verified customer login, used by project write endpoints."
         },
         {
             "key": "otp_code",
@@ -48,7 +61,7 @@
             "name": "Auth",
             "item": [
                 {
-                    "name": "Signup",
+                    "name": "POST /api/auth/signup",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -76,11 +89,27 @@
                                 "signup"
                             ]
                         },
-                        "description": "Creates a new unverified user and sends a signup OTP to the provided email. user_type must be customer, student, or company."
-                    }
+                        "description": "Creates an unverified customer, student, or company account and sends a signup OTP to the provided email. Required fields are username, email, password, password_confirmation, and user_type."
+                    },
+                    "response": [
+                        {
+                            "name": "201 Created",
+                            "status": "Created",
+                            "code": 201,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Account created successfully. Please verify the OTP sent to your email.\",\n    \"data\": {\n        \"email\": \"user@example.com\",\n        \"type\": \"signup\"\n    }\n}"
+                        }
+                    ]
                 },
                 {
-                    "name": "Verify OTP (Signup)",
+                    "name": "POST /api/auth/verify-otp (signup)",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -108,11 +137,27 @@
                                 "verify-otp"
                             ]
                         },
-                        "description": "Verifies a signup OTP and marks the user's email as verified."
-                    }
+                        "description": "Verifies a 6-character signup OTP and marks the user email as verified."
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"OTP verified successfully.\"\n}"
+                        }
+                    ]
                 },
                 {
-                    "name": "Login",
+                    "name": "POST /api/auth/login",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -140,11 +185,27 @@
                                 "login"
                             ]
                         },
-                        "description": "Authenticates a verified user and returns access and refresh JWTs."
-                    }
+                        "description": "Authenticates a verified user and returns access and refresh JWTs. Copy data.access_token into access_token, company_access_token, or customer_access_token depending on the account you logged in with."
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Logged in successfully.\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.access.example\",\n        \"access_token_expires_at\": \"2026-05-04T12:00:00.000000Z\",\n        \"refresh_token\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.refresh.example\",\n        \"refresh_token_expires_at\": \"2026-05-10T12:00:00.000000Z\",\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": 1,\n            \"username\": \"newuser\",\n            \"email\": \"user@example.com\",\n            \"is_verified\": true,\n            \"type\": \"student\"\n        }\n    }\n}"
+                        }
+                    ]
                 },
                 {
-                    "name": "Refresh Token",
+                    "name": "POST /api/auth/refresh",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -172,11 +233,27 @@
                                 "refresh"
                             ]
                         },
-                        "description": "Rotates the refresh token and returns a new access and refresh token pair."
-                    }
+                        "description": "Rotates a valid refresh token and returns a new access and refresh token pair."
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Token refreshed successfully.\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.access.refreshed\",\n        \"access_token_expires_at\": \"2026-05-04T13:00:00.000000Z\",\n        \"refresh_token\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.refresh.refreshed\",\n        \"refresh_token_expires_at\": \"2026-05-10T13:00:00.000000Z\",\n        \"token_type\": \"Bearer\"\n    }\n}"
+                        }
+                    ]
                 },
                 {
-                    "name": "Logout",
+                    "name": "POST /api/auth/logout",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -200,11 +277,27 @@
                                 "logout"
                             ]
                         },
-                        "description": "Revokes all user tokens by incrementing token_version. Requires a valid access token."
-                    }
+                        "description": "Revokes all user tokens by incrementing token_version. Requires any valid access token under the api guard."
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Logged out successfully.\"\n}"
+                        }
+                    ]
                 },
                 {
-                    "name": "Send Password OTP",
+                    "name": "POST /api/auth/send-email",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -232,11 +325,27 @@
                                 "send-email"
                             ]
                         },
-                        "description": "If the email exists, sends a password reset OTP. The response is intentionally generic."
-                    }
+                        "description": "If the email exists, sends a password_reset OTP. The response is intentionally generic regardless of whether the user exists."
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"If the email exists, an OTP has been sent.\",\n    \"data\": {\n        \"type\": \"password_reset\"\n    }\n}"
+                        }
+                    ]
                 },
                 {
-                    "name": "Verify OTP (Password Reset)",
+                    "name": "POST /api/auth/verify-otp (password_reset)",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -264,11 +373,27 @@
                                 "verify-otp"
                             ]
                         },
-                        "description": "Verifies a password reset OTP and returns a reset_token for the change-password step."
-                    }
+                        "description": "Verifies a 6-character password_reset OTP and returns a reset_token for change-password."
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"OTP verified successfully.\",\n    \"data\": {\n        \"reset_token\": \"reset-token-example\",\n        \"email\": \"user@example.com\"\n    }\n}"
+                        }
+                    ]
                 },
                 {
-                    "name": "Change Password",
+                    "name": "POST /api/auth/change-password",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -296,8 +421,24 @@
                                 "change-password"
                             ]
                         },
-                        "description": "Resets the password using the reset_token returned by the password_reset OTP verification step."
-                    }
+                        "description": "Resets the password using the reset_token returned by the password_reset OTP verification step. Password confirmation is required."
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Password changed successfully.\"\n}"
+                        }
+                    ]
                 }
             ]
         },
@@ -305,7 +446,7 @@
             "name": "Ads",
             "item": [
                 {
-                    "name": "List Ads",
+                    "name": "GET /api/ads",
                     "request": {
                         "method": "GET",
                         "header": [
@@ -324,11 +465,27 @@
                                 "ads"
                             ]
                         },
-                        "description": "Returns all ads with applicants_count, company name/description/image, and a dynamic since field. Public endpoint."
-                    }
+                        "description": "Public endpoint that returns all ads with applicants_count, company summary, since, created_at, and updated_at."
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Ads retrieved successfully.\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"job_name\": \"Backend Engineer\",\n            \"req1\": \"Laravel\",\n            \"req2\": \"REST APIs\",\n            \"req3\": \"MySQL\",\n            \"req4\": null,\n            \"req5\": null,\n            \"task1\": \"Build backend services\",\n            \"task2\": \"Write tests\",\n            \"task3\": null,\n            \"task4\": null,\n            \"task5\": null,\n            \"feature1\": \"Health insurance\",\n            \"feature2\": \"Remote work\",\n            \"feature3\": null,\n            \"feature4\": null,\n            \"feature5\": null,\n            \"additional_details\": \"Experience with queues is a plus.\",\n            \"github_required\": true,\n            \"resume_required\": true,\n            \"prev_work_required\": false,\n            \"expected_salary_required\": true,\n            \"company_id\": 7,\n            \"applicants_count\": 12,\n            \"company\": {\n                \"id\": 7,\n                \"name\": \"Acme Labs\",\n                \"description\": \"Product engineering company\",\n                \"image\": \"companies/acme-avatar.png\"\n            },\n            \"since\": \"2 days ago\",\n            \"created_at\": \"2026-05-01T08:30:00.000000Z\",\n            \"updated_at\": \"2026-05-01T08:30:00.000000Z\"\n        }\n    ]\n}"
+                        }
+                    ]
                 },
                 {
-                    "name": "Show Ad",
+                    "name": "GET /api/ads/{ad}",
                     "request": {
                         "method": "GET",
                         "header": [
@@ -348,11 +505,27 @@
                                 "{{ad_id}}"
                             ]
                         },
-                        "description": "Returns a single ad with applicants_count, company name/description/image, and a dynamic since field. Public endpoint."
-                    }
+                        "description": "Public endpoint that returns a single ad with applicants_count, company summary, since, created_at, and updated_at."
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Ad retrieved successfully.\",\n    \"data\": {\n        \"id\": 1,\n        \"job_name\": \"Backend Engineer\",\n        \"req1\": \"Laravel\",\n        \"req2\": \"REST APIs\",\n        \"req3\": \"MySQL\",\n        \"req4\": null,\n        \"req5\": null,\n        \"task1\": \"Build backend services\",\n        \"task2\": \"Write tests\",\n        \"task3\": null,\n        \"task4\": null,\n        \"task5\": null,\n        \"feature1\": \"Health insurance\",\n        \"feature2\": \"Remote work\",\n        \"feature3\": null,\n        \"feature4\": null,\n        \"feature5\": null,\n        \"additional_details\": \"Experience with queues is a plus.\",\n        \"github_required\": true,\n        \"resume_required\": true,\n        \"prev_work_required\": false,\n        \"expected_salary_required\": true,\n        \"company_id\": 7,\n        \"applicants_count\": 12,\n        \"company\": {\n            \"id\": 7,\n            \"name\": \"Acme Labs\",\n            \"description\": \"Product engineering company\",\n            \"image\": \"companies/acme-avatar.png\"\n        },\n        \"since\": \"2 days ago\",\n        \"created_at\": \"2026-05-01T08:30:00.000000Z\",\n        \"updated_at\": \"2026-05-01T08:30:00.000000Z\"\n    }\n}"
+                        }
+                    ]
                 },
                 {
-                    "name": "Create Ad",
+                    "name": "POST /api/ads",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -366,7 +539,7 @@
                             },
                             {
                                 "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
+                                "value": "Bearer {{company_access_token}}"
                             }
                         ],
                         "body": {
@@ -383,11 +556,27 @@
                                 "ads"
                             ]
                         },
-                        "description": "Creates a new ad for the authenticated company user. Requires a valid access token for a company account."
-                    }
+                        "description": "Creates a new ad for the authenticated company user. Required fields are job_name, req1, task1, feature1, github_required, resume_required, prev_work_required, and expected_salary_required. Use company_access_token from a verified company account."
+                    },
+                    "response": [
+                        {
+                            "name": "201 Created",
+                            "status": "Created",
+                            "code": 201,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Ad created successfully.\",\n    \"data\": {\n        \"id\": 2,\n        \"job_name\": \"Backend Engineer\",\n        \"req1\": \"Laravel\",\n        \"req2\": \"REST APIs\",\n        \"req3\": null,\n        \"req4\": null,\n        \"req5\": null,\n        \"task1\": \"Build backend services\",\n        \"task2\": \"Write tests\",\n        \"task3\": null,\n        \"task4\": null,\n        \"task5\": null,\n        \"feature1\": \"Health insurance\",\n        \"feature2\": \"Remote work\",\n        \"feature3\": null,\n        \"feature4\": null,\n        \"feature5\": null,\n        \"additional_details\": \"Experience with queues is a plus.\",\n        \"github_required\": true,\n        \"resume_required\": true,\n        \"prev_work_required\": false,\n        \"expected_salary_required\": true,\n        \"company_id\": 7,\n        \"applicants_count\": 0,\n        \"company\": {\n            \"id\": 7,\n            \"name\": \"Acme Labs\",\n            \"description\": \"Product engineering company\",\n            \"image\": \"companies/acme-avatar.png\"\n        },\n        \"since\": \"less than an hour ago\",\n        \"created_at\": \"2026-05-03T11:45:00.000000Z\",\n        \"updated_at\": \"2026-05-03T11:45:00.000000Z\"\n    }\n}"
+                        }
+                    ]
                 },
                 {
-                    "name": "Update Ad",
+                    "name": "PATCH /api/ads/{ad}",
                     "request": {
                         "method": "PATCH",
                         "header": [
@@ -401,7 +590,7 @@
                             },
                             {
                                 "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
+                                "value": "Bearer {{company_access_token}}"
                             }
                         ],
                         "body": {
@@ -419,11 +608,27 @@
                                 "{{ad_id}}"
                             ]
                         },
-                        "description": "Updates an existing ad owned by the authenticated company user. Partial updates are allowed."
-                    }
+                        "description": "Updates an ad owned by the authenticated company user. Partial updates are allowed, but ownership is enforced by the request authorize logic."
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Ad updated successfully.\",\n    \"data\": {\n        \"id\": 1,\n        \"job_name\": \"Senior Backend Engineer\",\n        \"req1\": \"Laravel\",\n        \"req2\": \"REST APIs\",\n        \"req3\": \"MySQL\",\n        \"req4\": null,\n        \"req5\": null,\n        \"task1\": \"Build backend services\",\n        \"task2\": \"Write tests\",\n        \"task3\": null,\n        \"task4\": null,\n        \"task5\": null,\n        \"feature1\": \"Medical insurance\",\n        \"feature2\": \"Remote work\",\n        \"feature3\": null,\n        \"feature4\": null,\n        \"feature5\": null,\n        \"additional_details\": \"Experience with queues is a plus.\",\n        \"github_required\": true,\n        \"resume_required\": true,\n        \"prev_work_required\": false,\n        \"expected_salary_required\": true,\n        \"company_id\": 7,\n        \"applicants_count\": 12,\n        \"company\": {\n            \"id\": 7,\n            \"name\": \"Acme Labs\",\n            \"description\": \"Product engineering company\",\n            \"image\": \"companies/acme-avatar.png\"\n        },\n        \"since\": \"2 days ago\",\n        \"created_at\": \"2026-05-01T08:30:00.000000Z\",\n        \"updated_at\": \"2026-05-03T12:10:00.000000Z\"\n    }\n}"
+                        }
+                    ]
                 },
                 {
-                    "name": "Delete Ad",
+                    "name": "DELETE /api/ads/{ad}",
                     "request": {
                         "method": "DELETE",
                         "header": [
@@ -433,7 +638,7 @@
                             },
                             {
                                 "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
+                                "value": "Bearer {{company_access_token}}"
                             }
                         ],
                         "url": {
@@ -447,8 +652,24 @@
                                 "{{ad_id}}"
                             ]
                         },
-                        "description": "Deletes an ad owned by the authenticated company user."
-                    }
+                        "description": "Deletes an ad owned by the authenticated company user. Ownership is enforced in the controller before deletion."
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Ad deleted successfully.\"\n}"
+                        }
+                    ]
                 }
             ]
         },
@@ -456,7 +677,7 @@
             "name": "Projects",
             "item": [
                 {
-                    "name": "List Projects",
+                    "name": "GET /api/projects",
                     "request": {
                         "method": "GET",
                         "header": [
@@ -475,11 +696,27 @@
                                 "projects"
                             ]
                         },
-                        "description": "Returns all projects with applicants_count, customer name/description/image, and a dynamic since field. Public endpoint."
-                    }
+                        "description": "Public endpoint that returns all projects with applicants_count, customer summary, since, created_at, and updated_at."
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Projects retrieved successfully.\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"name\": \"Analytics Portal\",\n            \"details\": \"Build an internal analytics portal.\",\n            \"tool1\": \"Laravel\",\n            \"tool2\": \"React\",\n            \"tool3\": \"PostgreSQL\",\n            \"tool4\": \"Redis\",\n            \"tool5\": \"Docker\",\n            \"cover_image\": \"projects/analytics.png\",\n            \"customer_id\": 15,\n            \"applicants_count\": 5,\n            \"customer\": {\n                \"id\": 15,\n                \"name\": \"Bright Retail\",\n                \"description\": \"Retail analytics team\",\n                \"image\": \"customers/bright-retail.png\"\n            },\n            \"since\": \"6 hours ago\",\n            \"created_at\": \"2026-05-03T06:00:00.000000Z\",\n            \"updated_at\": \"2026-05-03T06:00:00.000000Z\"\n        }\n    ]\n}"
+                        }
+                    ]
                 },
                 {
-                    "name": "Show Project",
+                    "name": "GET /api/projects/{project}",
                     "request": {
                         "method": "GET",
                         "header": [
@@ -499,11 +736,27 @@
                                 "{{project_id}}"
                             ]
                         },
-                        "description": "Returns a single project with applicants_count, customer name/description/image, and a dynamic since field. Public endpoint."
-                    }
+                        "description": "Public endpoint that returns a single project with applicants_count, customer summary, since, created_at, and updated_at."
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Project retrieved successfully.\",\n    \"data\": {\n        \"id\": 1,\n        \"name\": \"Analytics Portal\",\n        \"details\": \"Build an internal analytics portal.\",\n        \"tool1\": \"Laravel\",\n        \"tool2\": \"React\",\n        \"tool3\": \"PostgreSQL\",\n        \"tool4\": \"Redis\",\n        \"tool5\": \"Docker\",\n        \"cover_image\": \"projects/analytics.png\",\n        \"customer_id\": 15,\n        \"applicants_count\": 5,\n        \"customer\": {\n            \"id\": 15,\n            \"name\": \"Bright Retail\",\n            \"description\": \"Retail analytics team\",\n            \"image\": \"customers/bright-retail.png\"\n        },\n        \"since\": \"6 hours ago\",\n        \"created_at\": \"2026-05-03T06:00:00.000000Z\",\n        \"updated_at\": \"2026-05-03T06:00:00.000000Z\"\n    }\n}"
+                        }
+                    ]
                 },
                 {
-                    "name": "Create Project",
+                    "name": "POST /api/projects",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -517,7 +770,7 @@
                             },
                             {
                                 "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
+                                "value": "Bearer {{customer_access_token}}"
                             }
                         ],
                         "body": {
@@ -534,11 +787,27 @@
                                 "projects"
                             ]
                         },
-                        "description": "Creates a new project for the authenticated customer user. Requires a valid access token for a customer account."
-                    }
+                        "description": "Creates a new project for the authenticated customer user. Required fields are name, tool1 through tool5, and cover_image; details is optional. Use customer_access_token from a verified customer account."
+                    },
+                    "response": [
+                        {
+                            "name": "201 Created",
+                            "status": "Created",
+                            "code": 201,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Project created successfully.\",\n    \"data\": {\n        \"id\": 2,\n        \"name\": \"Analytics Portal\",\n        \"details\": \"Build an internal analytics portal.\",\n        \"tool1\": \"Laravel\",\n        \"tool2\": \"React\",\n        \"tool3\": \"PostgreSQL\",\n        \"tool4\": \"Redis\",\n        \"tool5\": \"Docker\",\n        \"cover_image\": \"projects/analytics.png\",\n        \"customer_id\": 15,\n        \"applicants_count\": 0,\n        \"customer\": {\n            \"id\": 15,\n            \"name\": \"Bright Retail\",\n            \"description\": \"Retail analytics team\",\n            \"image\": \"customers/bright-retail.png\"\n        },\n        \"since\": \"less than an hour ago\",\n        \"created_at\": \"2026-05-03T11:50:00.000000Z\",\n        \"updated_at\": \"2026-05-03T11:50:00.000000Z\"\n    }\n}"
+                        }
+                    ]
                 },
                 {
-                    "name": "Update Project",
+                    "name": "PATCH /api/projects/{project}",
                     "request": {
                         "method": "PATCH",
                         "header": [
@@ -552,7 +821,7 @@
                             },
                             {
                                 "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
+                                "value": "Bearer {{customer_access_token}}"
                             }
                         ],
                         "body": {
@@ -570,11 +839,27 @@
                                 "{{project_id}}"
                             ]
                         },
-                        "description": "Updates an existing project owned by the authenticated customer user. Partial updates are allowed."
-                    }
+                        "description": "Updates a project owned by the authenticated customer user. Partial updates are allowed, but ownership is enforced by the request authorize logic."
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Project updated successfully.\",\n    \"data\": {\n        \"id\": 1,\n        \"name\": \"Advanced Analytics Portal\",\n        \"details\": \"Build an internal analytics portal.\",\n        \"tool1\": \"Laravel\",\n        \"tool2\": \"React\",\n        \"tool3\": \"PostgreSQL\",\n        \"tool4\": \"Redis\",\n        \"tool5\": \"Docker\",\n        \"cover_image\": \"projects/advanced-analytics.png\",\n        \"customer_id\": 15,\n        \"applicants_count\": 5,\n        \"customer\": {\n            \"id\": 15,\n            \"name\": \"Bright Retail\",\n            \"description\": \"Retail analytics team\",\n            \"image\": \"customers/bright-retail.png\"\n        },\n        \"since\": \"6 hours ago\",\n        \"created_at\": \"2026-05-03T06:00:00.000000Z\",\n        \"updated_at\": \"2026-05-03T12:20:00.000000Z\"\n    }\n}"
+                        }
+                    ]
                 },
                 {
-                    "name": "Delete Project",
+                    "name": "DELETE /api/projects/{project}",
                     "request": {
                         "method": "DELETE",
                         "header": [
@@ -584,7 +869,7 @@
                             },
                             {
                                 "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
+                                "value": "Bearer {{customer_access_token}}"
                             }
                         ],
                         "url": {
@@ -598,8 +883,24 @@
                                 "{{project_id}}"
                             ]
                         },
-                        "description": "Deletes a project owned by the authenticated customer user."
-                    }
+                        "description": "Deletes a project owned by the authenticated customer user. Ownership is enforced in the controller before deletion."
+                    },
+                    "response": [
+                        {
+                            "name": "200 OK",
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Project deleted successfully.\"\n}"
+                        }
+                    ]
                 }
             ]
         }

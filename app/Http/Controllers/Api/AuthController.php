@@ -29,12 +29,17 @@ class AuthController extends Controller
         $validated = $request->validated();
 
         $result = DB::transaction(function () use ($validated, $otpService): array {
+            $userType = UserType::from($validated['user_type']);
+
             $user = User::create([
-                'type' => UserType::from($validated['user_type']),
+                'type' => $userType,
                 'username' => $validated['username'],
                 'email' => $validated['email'],
+                'is_verified' => false,
                 'password' => $validated['password'],
             ]);
+
+            $this->createProfileFor($user, $userType);
 
             $otp = $otpService->issue($user, OtpType::Signup);
 
@@ -64,7 +69,7 @@ class AuthController extends Controller
             ], 422);
         }
 
-        if (is_null($user->email_verified_at)) {
+        if (is_null($user->email_verified_at) || ! $user->is_verified) {
             return response()->json([
                 'message' => 'Your email address must be verified before logging in.',
             ], 403);
@@ -127,6 +132,7 @@ class AuthController extends Controller
 
         if ($type === OtpType::Signup) {
             $user->forceFill([
+                'is_verified' => true,
                 'email_verified_at' => now(),
             ])->save();
 
@@ -205,7 +211,18 @@ class AuthController extends Controller
             'id' => $user->id,
             'username' => $user->username,
             'email' => $user->email,
+            'is_verified' => $user->is_verified,
             'type' => $user->type?->value,
         ];
+    }
+
+    private function createProfileFor(User $user, UserType $userType): void
+    {
+        match ($userType) {
+            UserType::Student => $user->studentProfile()->create([]),
+            UserType::Customer => $user->customerProfile()->create([]),
+            UserType::Company => $user->companyProfile()->create([]),
+            default => null,
+        };
     }
 }
