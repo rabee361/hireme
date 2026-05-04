@@ -47,9 +47,6 @@ RUN npm install && npm run build
 # Set permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-# Copy Nginx config
-COPY ./docker/nginx.conf /etc/nginx/http.d/default.conf
-
 # Copy Supervisor config (if using queues/schedule)
 # COPY ./docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
