@@ -40,7 +40,7 @@ class Otp extends Model
     protected static function booted(): void
     {
         static::creating(function (self $otp): void {
-            $otp->code ??= Str::upper(Str::random(6));
+            $otp->code ??= (string) rand(100000, 999999);
             $otp->expires_at ??= now()->addMinutes(15);
         });
     }

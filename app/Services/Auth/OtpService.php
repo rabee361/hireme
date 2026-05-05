@@ -17,7 +17,7 @@ class OtpService
 
         return $user->otps()->create([
             'type' => $type,
-            'code' => Str::upper(Str::random(6)),
+            'code' => (string) rand(100000, 999999),
             'expires_at' => now()->addMinutes(15),
             'is_used' => false,
         ]);

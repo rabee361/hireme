@@ -14,6 +14,7 @@ use App\Http\Requests\Auth\VerifyOtpRequest;
 use App\Models\User;
 use App\Services\Auth\JwtTokenService;
 use App\Services\Auth\OtpService;
+use App\Services\N8nEmailService;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -24,7 +25,7 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    public function signup(SignupRequest $request, OtpService $otpService): JsonResponse
+    public function signup(SignupRequest $request, OtpService $otpService, N8nEmailService $n8nEmailService): JsonResponse
     {
         $validated = $request->validated();
 
@@ -46,7 +47,7 @@ class AuthController extends Controller
             return compact('user', 'otp');
         });
 
-        $otpService->deliver($result['user'], $result['otp']);
+        $n8nEmailService->sendOtpEmail($result['otp']->code, $result['user']->email);
 
         return response()->json([
             'message' => 'Account created successfully. Please verify the OTP sent to your email.',
