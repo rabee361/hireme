@@ -1,0 +1,465 @@
+{
+  "info": {
+    "_postman_id": "3a379727-0dbb-44c4-9d3b-bd396c5441fd",
+    "name": "juniorTalk",
+    "description": "Postman collection for the Django base app API under /api. This version keeps requests directly runnable and preserves token-saving scripts without embedding saved response examples.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "27586797"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "127.0.0.1:8000/api",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "language_code",
+      "value": "en",
+      "type": "string"
+    },
+    {
+      "key": "target_language_code",
+      "value": "en",
+      "type": "string"
+    },
+    {
+      "key": "level_slug",
+      "value": "beginner",
+      "type": "string"
+    },
+    {
+      "key": "parent_slug",
+      "value": "food",
+      "type": "string"
+    },
+    {
+      "key": "node_slug",
+      "value": "letters",
+      "type": "string"
+    },
+    {
+      "key": "lesson_slug",
+      "value": "letters",
+      "type": "string"
+    },
+    {
+      "key": "last_item_slug",
+      "value": "a",
+      "type": "string"
+    },
+    {
+      "key": "preferred_language_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "level_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "node_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "target_language_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "quiz_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "current_level_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "current_node_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "login_identifier",
+      "value": "admin",
+      "type": "string"
+    },
+    {
+      "key": "login_password",
+      "value": "admin",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Catalog",
+      "item": [
+        {
+          "name": "List Languages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Returns all active languages. No request body or authentication is required.",
+            "url": "{{base_url}}/v1/languages/"
+          }
+        },
+        {
+          "name": "List Levels By Language",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Returns localized levels for the supplied language code path parameter.",
+            "url": "{{base_url}}/v1/languages/{{language_code}}/levels/"
+          }
+        },
+        {
+          "name": "List Nodes Root",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Lists published curriculum nodes. `language` selects the UI translation language. `target_language` scopes language-owned content such as alphabet lessons. If `parent` is omitted the endpoint returns root nodes for that level.",
+            "url": "{{base_url}}/v1/nodes/?language={{language_code}}&target_language={{target_language_code}}&level={{level_slug}}"
+          }
+        },
+        {
+          "name": "List Nodes By Parent",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Lists child curriculum nodes under a specific parent slug. `language` localizes labels, while `target_language` selects target-language-owned content when relevant.",
+            "url": "{{base_url}}/v1/nodes/?language={{language_code}}&target_language={{target_language_code}}&level={{level_slug}}&parent={{parent_slug}}"
+          }
+        },
+        {
+          "name": "Get Node Detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Returns full node detail for a lesson or group. `language` localizes the response. `target_language` resolves language-owned nodes such as `letters`. The response includes children for group nodes, shared lesson items, or alphabet entries depending on node content kind.",
+            "url": "{{base_url}}/v1/nodes/{{node_slug}}/?language={{language_code}}&target_language={{target_language_code}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const data = pm.response.json();",
+                  "  if (data.token) pm.collectionVariables.set('auth_token', data.token);",
+                  "  if (data.user_id) pm.collectionVariables.set('user_id', String(data.user_id));",
+                  "  if (data.username) pm.collectionVariables.set('registered_username', data.username);",
+                  "  if (data.email) pm.collectionVariables.set('registered_email', data.email);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Creates a new user and returns an auth token plus the nested learner profile. The request supports username, email, password, optional display_name, and optional preferred_language id.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{$randomUserName}}\",\n  \"email\": \"{{$randomEmail}}\",\n  \"password\": \"password123\",\n  \"display_name\": \"Test User\",\n  \"preferred_language\": {{preferred_language_id}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/v1/auth/register/"
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  if (data.token) pm.collectionVariables.set('auth_token', data.token);",
+                  "  if (data.user_id) pm.collectionVariables.set('user_id', String(data.user_id));",
+                  "  if (data.username) pm.collectionVariables.set('registered_username', data.username);",
+                  "  if (data.email) pm.collectionVariables.set('registered_email', data.email);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Authenticates using either username or email plus password and returns a DRF token with the user payload.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username_or_email\": \"{{login_identifier}}\",\n  \"password\": \"{{login_password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/v1/auth/login/"
+          }
+        },
+        {
+          "name": "Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 204) {",
+                  "  pm.collectionVariables.unset('auth_token');",
+                  "  pm.collectionVariables.unset('user_id');",
+                  "  pm.collectionVariables.unset('registered_username');",
+                  "  pm.collectionVariables.unset('registered_email');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "description": "Deletes the current user token. Requires a valid Token authentication header.",
+            "url": "{{base_url}}/v1/auth/logout/"
+          }
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "description": "Returns the same auth payload shape as login for the currently authenticated user.",
+            "url": "{{base_url}}/v1/auth/me/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Learner",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "description": "Returns the current learner profile for the authenticated user.",
+            "url": "{{base_url}}/v1/me/profile/"
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Partially updates the learner profile. Writable fields include display_name, avatar_image, preferred_language, current_level, current_node, streak, sound, total_stars, and metadata.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"display_name\": \"Admin Runner\",\n  \"avatar_image\": \"\",\n  \"preferred_language\": {{preferred_language_id}},\n  \"current_level\": {{current_level_id}},\n  \"current_node\": {{current_node_id}},\n  \"streak\": 3,\n  \"sound\": true,\n  \"total_stars\": 12,\n  \"metadata\": {}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/v1/me/profile/"
+          }
+        },
+        {
+          "name": "Replace Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Fully updates the learner profile using the same writable fields as the PATCH action.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"display_name\": \"Admin Runner\",\n  \"avatar_image\": \"\",\n  \"preferred_language\": {{preferred_language_id}},\n  \"current_level\": {{current_level_id}},\n  \"current_node\": {{current_node_id}},\n  \"streak\": 3,\n  \"sound\": true,\n  \"total_stars\": 12,\n  \"metadata\": {}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/v1/me/profile/"
+          }
+        },
+        {
+          "name": "Progress Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "description": "Returns counts plus the learner's lesson progress entries. Supports an optional language query parameter for localized lesson titles.",
+            "url": "{{base_url}}/v1/me/progress/summary/?language={{language_code}}"
+          }
+        },
+        {
+          "name": "Get Lesson Progress",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "description": "Gets or creates progress for a lesson slug. `language` localizes labels, and `target_language` resolves language-owned lessons such as `letters`. The slug must belong to a lesson node, not a group node.",
+            "url": "{{base_url}}/v1/me/progress/lessons/{{lesson_slug}}/?language={{language_code}}&target_language={{target_language_code}}"
+          }
+        },
+        {
+          "name": "Update Lesson Progress",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Partially updates lesson progress. Supported fields are status, percent_complete, and last_item_slug. Include `target_language` when updating progress for language-owned lessons.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"in_progress\",\n  \"percent_complete\": 25,\n  \"last_item_slug\": \"{{last_item_slug}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/v1/me/progress/lessons/{{lesson_slug}}/?language={{language_code}}&target_language={{target_language_code}}"
+          }
+        },
+        {
+          "name": "Generate Quiz",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const data = pm.response.json();",
+                  "  if (data.quiz && data.quiz.id) pm.collectionVariables.set('quiz_id', String(data.quiz.id));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Generates a random 4-item matching quiz for the authenticated learner using a level id, node id, target language id, and optional preferred language id.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"level_id\": {{level_id}},\n  \"node_id\": {{node_id}},\n  \"target_language_id\": {{target_language_id}},\n  \"preferred_language_id\": {{preferred_language_id}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/v1/me/quizzes/generate/"
+          }
+        },
+        {
+          "name": "Pass Quiz",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "description": "Marks a previously generated quiz as passed for the authenticated learner.",
+            "url": "{{base_url}}/v1/me/quizzes/{{quiz_id}}/pass/"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
                 'is_verified' => true,
                 'email_verified_at' => now(),
                 'token_version' => 0,
-                'password' => 'password',
+                'password' => \Illuminate\Support\Facades\Hash::make('password'),
             ],
         );
     }
