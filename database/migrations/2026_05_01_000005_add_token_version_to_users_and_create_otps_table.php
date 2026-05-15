@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('code', 6);
             $table->boolean('is_used')->default(false);
             $table->timestamp('created_at')->useCurrent();
-            $table->timestamp('expires_at');
+            $table->dateTime('expires_at');
             $table->index(['user_id', 'type', 'is_used']);
         });
     }

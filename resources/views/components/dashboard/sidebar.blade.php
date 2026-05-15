@@ -11,6 +11,16 @@
             'icon' => 'customers',
         ],
         [
+            'label' => 'الإعلانات',
+            'route' => 'dashboard.ads',
+            'icon' => 'ads',
+        ],
+        [
+            'label' => 'المشاريع',
+            'route' => 'dashboard.projects',
+            'icon' => 'projects',
+        ],
+        [
             'label' => 'المشرفون',
             'route' => 'dashboard.admins',
             'icon' => 'admins',

@@ -2,13 +2,56 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <script>
-    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-        document.documentElement.style.colorScheme = 'dark';
-    } else {
-        document.documentElement.classList.remove('dark');
-        document.documentElement.style.colorScheme = 'light';
-    }
+    window.HiremeeTheme = (() => {
+        const primaryKey = 'hiremee-theme';
+        const legacyKey = 'theme';
+        let currentTheme = 'light';
+
+        const systemTheme = () => window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+
+        const getStoredTheme = () => {
+            const primaryTheme = localStorage.getItem(primaryKey);
+
+            if (primaryTheme === 'dark' || primaryTheme === 'light') {
+                return primaryTheme;
+            }
+
+            const legacyTheme = localStorage.getItem(legacyKey);
+
+            if (legacyTheme === 'dark' || legacyTheme === 'light') php artisan --version
+{
+                return legacyTheme;
+            }
+
+            return systemTheme();
+        };
+
+        const applyTheme = (theme) => {
+            const nextTheme = theme === 'dark' ? 'dark' : 'light';
+
+            document.documentElement.classList.toggle('dark', nextTheme === 'dark');
+            document.documentElement.style.colorScheme = nextTheme;
+            localStorage.setItem(primaryKey, nextTheme);
+            localStorage.setItem(legacyKey, nextTheme);
+            currentTheme = nextTheme;
+
+            return nextTheme;
+        };
+
+        const syncTheme = () => applyTheme(getStoredTheme());
+
+        syncTheme();
+        document.addEventListener('livewire:navigated', syncTheme);
+        window.addEventListener('pageshow', syncTheme);
+
+        return {
+            get: () => getStoredTheme(),
+            set: applyTheme,
+            toggle: () => applyTheme(getStoredTheme() === 'dark' ? 'light' : 'dark'),
+            sync: syncTheme,
+            current: () => currentTheme,
+        };
+    })();
 </script>
 
 <title>

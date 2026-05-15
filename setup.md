@@ -6,10 +6,10 @@ This project uses Laravel 12, MySQL, database-backed sessions/cache/queue, Vite 
 
 Make sure these tools are installed before you start:
 
-- PHP 8.2 or newer
-- Composer
+- PHP 8.2 or newer (8.4.5 is used)
+- Composer (laravel 12.58.0)
 - Node.js and npm
-- MySQL
+- MySQL or sqlite
 - PHP `pdo_mysql` extension enabled
 
 ## 2. Create the MySQL Database
@@ -161,18 +161,12 @@ Use the manual steps above if you want the most explicit setup flow.
 ## 9. Quick Command Summary
 
 ```powershell
-Copy-Item .env.example .env
 composer install
 npm install
+php artisan migrate
 php artisan optimize:clear
 php artisan key:generate
 php artisan jwt:secret
-php artisan migrate
+php artisan db:seed
 php artisan serve
-```
-
-In another terminal:
-
-```powershell
-npm run dev
 ```

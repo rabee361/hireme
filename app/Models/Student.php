@@ -14,6 +14,6 @@ class Student extends TypedUser
 
     public function profile(): HasOne
     {
-        return $this->hasOne(StudentProfile::class);
+        return $this->hasOne(StudentProfile::class, 'user_id');
     }
 }

@@ -15,7 +15,7 @@ class Company extends TypedUser
 
     public function profile(): HasOne
     {
-        return $this->hasOne(CompanyProfile::class);
+        return $this->hasOne(CompanyProfile::class, 'user_id');
     }
 
     public function ads(): HasMany

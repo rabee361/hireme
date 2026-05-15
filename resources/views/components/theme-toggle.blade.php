@@ -1,16 +1,11 @@
 <button
     x-data="{
-        theme: localStorage.getItem('theme') || 'light',
+        theme: 'light',
+        init() {
+            this.theme = window.HiremeeTheme?.sync()?.toString() || window.HiremeeTheme?.get() || 'light';
+        },
         toggle() {
-            this.theme = this.theme === 'dark' ? 'light' : 'dark';
-            localStorage.setItem('theme', this.theme);
-            if (this.theme === 'dark') {
-                document.documentElement.classList.add('dark');
-                document.documentElement.style.colorScheme = 'dark';
-            } else {
-                document.documentElement.classList.remove('dark');
-                document.documentElement.style.colorScheme = 'light';
-            }
+            this.theme = window.HiremeeTheme?.toggle() || (this.theme === 'dark' ? 'light' : 'dark');
             $dispatch('theme-changed', this.theme);
         }
     }"

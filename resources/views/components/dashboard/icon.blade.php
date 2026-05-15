@@ -27,6 +27,18 @@
         </svg>
         @break
 
+    @case('ads')
+        <svg {{ $attributes->merge(['viewBox' => '0 0 24 24', 'fill' => 'none', 'stroke' => 'currentColor', 'stroke-width' => '1.8', 'class' => 'size-5']) }}>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 4.97-4.03 9-9 9a8.97 8.97 0 0 1-4.95-1.485L3 21l1.485-4.05A8.97 8.97 0 0 1 3 12c0-4.97 4.03-9 9-9s9 4.03 9 9Z" />
+        </svg>
+        @break
+
+    @case('projects')
+        <svg {{ $attributes->merge(['viewBox' => '0 0 24 24', 'fill' => 'none', 'stroke' => 'currentColor', 'stroke-width' => '1.8', 'class' => 'size-5']) }}>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75A2.25 2.25 0 0 1 6 4.5h4.5A2.25 2.25 0 0 1 12.75 6.75v10.5A2.25 2.25 0 0 1 10.5 19.5H6a2.25 2.25 0 0 1-2.25-2.25V6.75Zm7.5 0A2.25 2.25 0 0 1 13.5 4.5H18a2.25 2.25 0 0 1 2.25 2.25v4.5A2.25 2.25 0 0 1 18 13.5h-4.5a2.25 2.25 0 0 1-2.25-2.25v-4.5Zm2.25 9A2.25 2.25 0 0 1 15.75 13.5H18A2.25 2.25 0 0 1 20.25 15.75v1.5A2.25 2.25 0 0 1 18 19.5h-2.25a2.25 2.25 0 0 1-2.25-2.25v-1.5Z" />
+        </svg>
+        @break
+
     @case('search')
         <svg {{ $attributes->merge(['viewBox' => '0 0 24 24', 'fill' => 'none', 'stroke' => 'currentColor', 'stroke-width' => '1.8', 'class' => 'size-5']) }}>
             <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.04 6.04a7.5 7.5 0 0 0 10.61 10.61Z" />

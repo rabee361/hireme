@@ -15,7 +15,7 @@ class Customer extends TypedUser
 
     public function profile(): HasOne
     {
-        return $this->hasOne(CustomerProfile::class);
+        return $this->hasOne(CustomerProfile::class, 'user_id');
     }
 
     public function projects(): HasMany
