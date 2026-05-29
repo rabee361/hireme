@@ -14,6 +14,36 @@
       "key": "access_token",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "device_id",
+      "value": "android-emulator-01",
+      "type": "string"
+    },
+    {
+      "key": "fcm_token",
+      "value": "fcm-token-placeholder",
+      "type": "string"
+    },
+    {
+      "key": "platform",
+      "value": "android",
+      "type": "string"
+    },
+    {
+      "key": "app_version",
+      "value": "1.0.0",
+      "type": "string"
+    },
+    {
+      "key": "device_token_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "push_notification_recipient_id",
+      "value": "1",
+      "type": "string"
     }
   ],
   "item": [
@@ -27,7 +57,7 @@
             "header": [
               { "key": "Accept", "value": "application/json" }
             ],
-            "description": "Creates an unverified account and sends OTP to the supplied email.",
+            "description": "Creates an unverified account and sends OTP to the supplied email. Device token storage happens after successful signup OTP verification.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"username\": \"newuser\",\n  \"email\": \"user@example.com\",\n  \"password\": \"Test143@@##\",\n  \"password_confirmation\": \"Test143@@##\",\n  \"user_type\": \"student\"\n}",
@@ -54,10 +84,10 @@
             "header": [
               { "key": "Accept", "value": "application/json" }
             ],
-            "description": "Verifies a 6-character OTP (signup or password_reset).",
+            "description": "Verifies a 6-character OTP (signup or password_reset). For signup verification, optional device data stores the current FCM token for that user.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"user@example.com\",\n  \"code\": \"ABC123\",\n  \"type\": \"signup\"\n}",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"code\": \"ABC123\",\n  \"type\": \"signup\",\n  \"device_id\": \"{{device_id}}\",\n  \"fcm_token\": \"{{fcm_token}}\",\n  \"platform\": \"{{platform}}\",\n  \"app_version\": \"{{app_version}}\"\n}",
               "options": { "raw": { "language": "json" } }
             },
             "url": "{{base_url}}/auth/verify-otp"
@@ -81,10 +111,10 @@
             "header": [
               { "key": "Accept", "value": "application/json" }
             ],
-            "description": "Authenticates a verified user and returns access + refresh JWTs.",
+            "description": "Authenticates a verified user, returns access + refresh JWTs, and updates or creates the submitted device token when device data is included.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"Test143@@##\"\n}",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"Test143@@##\",\n  \"device_id\": \"{{device_id}}\",\n  \"fcm_token\": \"{{fcm_token}}\",\n  \"platform\": \"{{platform}}\",\n  \"app_version\": \"{{app_version}}\"\n}",
               "options": { "raw": { "language": "json" } }
             },
             "url": "{{base_url}}/auth/login"
@@ -340,6 +370,131 @@
               "header": [{ "key": "Content-Type", "value": "application/json" }],
               "cookie": [],
               "body": "{\n    \"message\": \"Customer retrieved successfully.\",\n    \"data\": {\n        \"id\": 9,\n        \"username\": \"Client One\",\n        \"email\": \"client@example.com\",\n        \"type\": \"customer\",\n        \"profile\": {\n            \"id\": 6,\n            \"user_id\": 9,\n            \"title\": \"Product Owner\",\n            \"college\": \"Ain Shams\"\n        }\n    }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Register Device Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}", "type": "text" }
+            ],
+            "description": "Creates or updates a device token for the authenticated user without requiring a fresh login.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"device_id\": \"{{device_id}}\",\n  \"fcm_token\": \"{{fcm_token}}\",\n  \"platform\": \"{{platform}}\",\n  \"app_version\": \"{{app_version}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/device-tokens"
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Device token saved successfully.\",\n    \"data\": {\n        \"id\": 1,\n        \"device_id\": \"android-emulator-01\",\n        \"platform\": \"android\",\n        \"is_active\": true\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Device Tokens",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}", "type": "text" }
+            ],
+            "description": "Lists all saved devices for the authenticated user. Multiple active devices are supported and notifications fan out to all active tokens.",
+            "url": "{{base_url}}/device-tokens"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Device tokens retrieved successfully.\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"device_id\": \"android-emulator-01\",\n            \"platform\": \"android\",\n            \"app_version\": \"1.0.0\",\n            \"is_active\": true,\n            \"last_seen_at\": \"2026-05-28T12:00:00Z\"\n        }\n    ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Device Token",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}", "type": "text" }
+            ],
+            "description": "Deletes one saved device token for the authenticated user.",
+            "url": "{{base_url}}/device-tokens/{{device_token_id}}"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Device token removed successfully.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Push Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}", "type": "text" }
+            ],
+            "description": "Lists push notifications received by the authenticated user.",
+            "url": "{{base_url}}/push-notifications"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Notifications retrieved successfully.\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"status\": \"sent\",\n            \"read_at\": null,\n            \"sent_at\": \"2026-05-28T12:00:00Z\",\n            \"notification\": {\n                \"id\": 1,\n                \"type\": \"admin_announcement\",\n                \"title\": \"System update\",\n                \"body\": \"A new job has been posted.\",\n                \"data\": [],\n                \"created_at\": \"2026-05-28T11:59:00Z\"\n            }\n        }\n    ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Mark Push Notification Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}", "type": "text" }
+            ],
+            "description": "Marks one notification recipient row as read for the authenticated user.",
+            "url": "{{base_url}}/push-notifications/{{push_notification_recipient_id}}/read"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Notification marked as read.\"\n}"
             }
           ]
         }

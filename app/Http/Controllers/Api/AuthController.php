@@ -12,6 +12,7 @@ use App\Http\Requests\Auth\SendPasswordOtpRequest;
 use App\Http\Requests\Auth\SignupRequest;
 use App\Http\Requests\Auth\VerifyOtpRequest;
 use App\Models\User;
+use App\Services\Auth\DeviceTokenService;
 use App\Services\Auth\JwtTokenService;
 use App\Services\Auth\OtpService;
 use App\Services\N8nEmailService;
@@ -58,7 +59,7 @@ class AuthController extends Controller
         ], 201);
     }
 
-    public function login(LoginRequest $request, JwtTokenService $jwtTokenService): JsonResponse
+    public function login(LoginRequest $request, JwtTokenService $jwtTokenService, DeviceTokenService $deviceTokenService): JsonResponse
     {
         $validated = $request->validated();
 
@@ -75,6 +76,8 @@ class AuthController extends Controller
                 'message' => 'Your email address must be verified before logging in.',
             ], 403);
         }
+
+        $deviceTokenService->storeFromPayload($user, $validated);
 
         return response()->json([
             'message' => 'Logged in successfully.',
@@ -110,7 +113,7 @@ class AuthController extends Controller
         ]);
     }
 
-    public function verifyOtp(VerifyOtpRequest $request, OtpService $otpService): JsonResponse
+    public function verifyOtp(VerifyOtpRequest $request, OtpService $otpService, DeviceTokenService $deviceTokenService): JsonResponse
     {
         $validated = $request->validated();
 
@@ -136,6 +139,8 @@ class AuthController extends Controller
                 'is_verified' => true,
                 'email_verified_at' => now(),
             ])->save();
+
+            $deviceTokenService->storeFromPayload($user, $validated);
 
             return response()->json([
                 'message' => 'OTP verified successfully.',

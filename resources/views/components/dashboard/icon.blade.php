@@ -3,6 +3,12 @@
 ])
 
 @switch($name)
+    @case('home')
+        <svg {{ $attributes->merge(['viewBox' => '0 0 24 24', 'fill' => 'none', 'stroke' => 'currentColor', 'stroke-width' => '1.8', 'class' => 'size-5']) }}>
+            <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955a1.125 1.125 0 0 1 1.591 0L21.75 12M4.5 9.75v9A1.5 1.5 0 0 0 6 20.25h3.75v-4.5A1.5 1.5 0 0 1 11.25 14.25h1.5a1.5 1.5 0 0 1 1.5 1.5v4.5H18a1.5 1.5 0 0 0 1.5-1.5v-9" />
+        </svg>
+        @break
+
     @case('companies')
         <svg {{ $attributes->merge(['viewBox' => '0 0 24 24', 'fill' => 'none', 'stroke' => 'currentColor', 'stroke-width' => '1.8', 'class' => 'size-5']) }}>
             <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M5.25 21V7.5A2.25 2.25 0 0 1 7.5 5.25h9A2.25 2.25 0 0 1 18.75 7.5V21M9 9.75h.008v.008H9V9.75Zm0 3h.008v.008H9v-.008Zm0 3h.008v.008H9v-.008Zm6-6h.008v.008H15V9.75Zm0 3h.008v.008H15v-.008Zm0 3h.008v.008H15v-.008Z" />

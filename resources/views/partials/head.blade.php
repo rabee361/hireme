@@ -6,8 +6,9 @@
         const primaryKey = 'hiremee-theme';
         const legacyKey = 'theme';
         let currentTheme = 'light';
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
-        const systemTheme = () => window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        const systemTheme = () => mediaQuery.matches ? 'dark' : 'light';
 
         const getStoredTheme = () => {
             const primaryTheme = localStorage.getItem(primaryKey);
@@ -18,36 +19,56 @@
 
             const legacyTheme = localStorage.getItem(legacyKey);
 
-            if (legacyTheme === 'dark' || legacyTheme === 'light') php artisan --version
-{
+            if (legacyTheme === 'dark' || legacyTheme === 'light') {
                 return legacyTheme;
             }
 
-            return systemTheme();
+            return null;
         };
 
-        const applyTheme = (theme) => {
+        const resolvedTheme = () => getStoredTheme() ?? systemTheme();
+
+        const applyTheme = (theme, persist = true) => {
             const nextTheme = theme === 'dark' ? 'dark' : 'light';
 
             document.documentElement.classList.toggle('dark', nextTheme === 'dark');
             document.documentElement.style.colorScheme = nextTheme;
-            localStorage.setItem(primaryKey, nextTheme);
-            localStorage.setItem(legacyKey, nextTheme);
+
+            if (persist) {
+                localStorage.setItem(primaryKey, nextTheme);
+                localStorage.setItem(legacyKey, nextTheme);
+            }
+
             currentTheme = nextTheme;
 
             return nextTheme;
         };
 
-        const syncTheme = () => applyTheme(getStoredTheme());
+        const syncTheme = () => applyTheme(resolvedTheme(), false);
+
+        const clearStoredTheme = () => {
+            localStorage.removeItem(primaryKey);
+            localStorage.removeItem(legacyKey);
+        };
 
         syncTheme();
         document.addEventListener('livewire:navigated', syncTheme);
         window.addEventListener('pageshow', syncTheme);
+        mediaQuery.addEventListener('change', () => {
+            if (!getStoredTheme()) {
+                syncTheme();
+            }
+        });
 
         return {
-            get: () => getStoredTheme(),
-            set: applyTheme,
-            toggle: () => applyTheme(getStoredTheme() === 'dark' ? 'light' : 'dark'),
+            get: resolvedTheme,
+            set: (theme) => applyTheme(theme, true),
+            clear: () => {
+                clearStoredTheme();
+
+                return syncTheme();
+            },
+            toggle: () => applyTheme(resolvedTheme() === 'dark' ? 'light' : 'dark', true),
             sync: syncTheme,
             current: () => currentTheme,
         };

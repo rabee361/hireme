@@ -2,12 +2,15 @@
 
 namespace App\Providers;
 
+use App\Services\Notifications\FirebaseMessagingClient;
+use App\Services\Notifications\KreaitFirebaseMessagingClient;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Kreait\Firebase\Factory;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +22,13 @@ class AppServiceProvider extends ServiceProvider
         if (class_exists(\Laravel\Fortify\Fortify::class)) {
             \Laravel\Fortify\Fortify::ignoreRoutes();
         }
+
+        $this->app->singleton(FirebaseMessagingClient::class, function () {
+            $factory = (new Factory())
+                ->withServiceAccount(config('services.firebase.credentials'));
+
+            return new KreaitFirebaseMessagingClient($factory->createMessaging());
+        });
     }
 
     /**

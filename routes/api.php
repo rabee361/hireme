@@ -4,7 +4,9 @@ use App\Http\Controllers\Api\AdController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\CustomerController;
+use App\Http\Controllers\Api\DeviceTokenController;
 use App\Http\Controllers\Api\ProjectController;
+use App\Http\Controllers\Api\PushNotificationController;
 use App\Http\Controllers\Api\StudentController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,4 +33,11 @@ Route::middleware(['auth:api', 'jwt.access'])->group(function () {
 
     Route::apiResource('ads', AdController::class)->only(['store', 'update', 'destroy']);
     Route::apiResource('projects', ProjectController::class)->only(['store', 'update', 'destroy']);
+
+    Route::get('device-tokens', [DeviceTokenController::class, 'index']);
+    Route::post('device-tokens', [DeviceTokenController::class, 'store']);
+    Route::delete('device-tokens/{deviceToken}', [DeviceTokenController::class, 'destroy']);
+
+    Route::get('push-notifications', [PushNotificationController::class, 'index']);
+    Route::patch('push-notifications/{pushNotificationRecipient}/read', [PushNotificationController::class, 'markAsRead']);
 });

@@ -39,4 +39,19 @@ return [
         'webhook_url' => env('N8N_WEBHOOK_URL', 'https://rabeehasan1028.app.n8n.cloud/webhook/30657344-665f-4bb8-a7ad-a8fa5f87c38f'),
     ],
 
+    'firebase' => [
+        'project_id' => env('FIREBASE_PROJECT_ID', 'hiremee-placeholder-project'),
+        'credentials' => (static function (): string {
+            $credentials = env('FIREBASE_CREDENTIALS');
+
+            if (is_string($credentials) && $credentials !== '') {
+                return preg_match('/^(?:[A-Za-z]:[\\\\\/]|[\\\/])/', $credentials) === 1
+                    ? $credentials
+                    : base_path($credentials);
+            }
+
+            return storage_path('app/firebase/firebase-credentials.placeholder.json');
+        })(),
+    ],
+
 ];

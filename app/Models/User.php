@@ -99,6 +99,21 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Otp::class);
     }
 
+    public function deviceTokens(): HasMany
+    {
+        return $this->hasMany(DeviceToken::class);
+    }
+
+    public function pushNotificationRecipients(): HasMany
+    {
+        return $this->hasMany(PushNotificationRecipient::class);
+    }
+
+    public function initiatedPushNotifications(): HasMany
+    {
+        return $this->hasMany(PushNotification::class, 'initiator_id');
+    }
+
     public function getJWTIdentifier(): mixed
     {
         return $this->getKey();

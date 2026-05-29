@@ -8,13 +8,13 @@
             <div class="dashboard-grid pointer-events-none absolute inset-0 opacity-60"></div>
             <div class="pointer-events-none absolute inset-x-0 top-0 h-80 bg-[radial-gradient(circle_at_top,_rgba(79,208,157,0.24),_transparent_70%)]"></div>
 
-            <div class="relative flex min-h-screen flex-col lg:flex-row-reverse">
+            <div class="relative min-h-screen">
                 <x-dashboard.sidebar />
 
-                <div class="flex min-h-screen min-w-0 flex-1 flex-col lg:ps-2">
+                <div class="flex min-h-screen min-w-0 flex-col lg:pr-[23rem]">
                     <x-dashboard.topbar />
 
-                    <main class="flex-1 px-4 pb-6 pt-2 sm:px-6 lg:px-10 lg:pb-10 lg:pt-0">
+                    <main class="flex-1 px-4 pb-6 pt-2 lg:pb-10 lg:pt-0">
                         {{ $slot }}
                     </main>
                 </div>

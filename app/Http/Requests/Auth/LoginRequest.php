@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Concerns\DeviceTokenValidationRules;
 use Illuminate\Foundation\Http\FormRequest;
 
 class LoginRequest extends FormRequest
 {
+    use DeviceTokenValidationRules;
+
     public function authorize(): bool
     {
         return true;
@@ -21,6 +24,7 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
+            ...$this->optionalDeviceTokenRules(),
         ];
     }
 }

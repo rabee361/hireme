@@ -2,12 +2,15 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Concerns\DeviceTokenValidationRules;
 use App\Enums\OtpType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class VerifyOtpRequest extends FormRequest
 {
+    use DeviceTokenValidationRules;
+
     public function authorize(): bool
     {
         return true;
@@ -27,6 +30,7 @@ class VerifyOtpRequest extends FormRequest
                 OtpType::Signup->value,
                 OtpType::PasswordReset->value,
             ])],
+            ...$this->optionalDeviceTokenRules(),
         ];
     }
 }

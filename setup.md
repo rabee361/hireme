@@ -42,6 +42,9 @@ APP_ENV=local
 APP_DEBUG=true
 APP_URL=http://127.0.0.1:8000
 
+FIREBASE_PROJECT_ID=your-firebase-project-id
+FIREBASE_CREDENTIALS=path/to/your-firebase-service-account.json
+
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
@@ -62,6 +65,8 @@ Notes:
 - If your MySQL server uses a different host or port, change `DB_HOST` and `DB_PORT`.
 - `JWT_SECRET` should stay empty for now. It will be generated with an artisan command.
 - For local development, you can keep `MAIL_MAILER=log` unless you want to connect a real mail service.
+- `FIREBASE_CREDENTIALS` should point to the Firebase Admin SDK service-account JSON file, not `google-services.json`.
+- Relative Firebase credential paths are resolved from the project root.
 
 ## 4. Install Dependencies
 
