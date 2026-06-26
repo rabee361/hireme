@@ -17,6 +17,27 @@ class CompaniesPage extends Component
     #[Url(as: 'q', except: '')]
     public string $search = '';
 
+    public ?int $selectedItemId = null;
+
+    public function showItem(int $id): void
+    {
+        $this->selectedItemId = $id;
+    }
+
+    public function closeModal(): void
+    {
+        $this->selectedItemId = null;
+    }
+
+    #[\Livewire\Attributes\Computed]
+    public function selectedItem(): ?Company
+    {
+        if (! $this->selectedItemId) {
+            return null;
+        }
+        return Company::with('profile')->withCount('ads')->find($this->selectedItemId);
+    }
+
     public function updatingSearch(): void
     {
         $this->resetPage();

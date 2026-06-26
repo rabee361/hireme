@@ -72,7 +72,7 @@
                         <a
                             href="{{ route($item['route']) }}"
                             wire:navigate
-                            wire:current="bg-brand-600 text-white shadow-[0_20px_45px_rgba(21,152,104,0.3)] dark:bg-brand-500 dark:shadow-none"
+                            wire:current{{ $item['route'] === 'dashboard.home' ? '.exact' : '' }}="bg-brand-600 text-white shadow-[0_20px_45px_rgba(21,152,104,0.3)] dark:bg-brand-500 dark:shadow-none"
                             class="group flex items-center gap-3 rounded-3xl px-4 py-3 text-zinc-700 transition dark:text-zinc-400"
                         >
                             <span class="grid h-11 w-11 shrink-0 place-items-center rounded-[1.15rem] border border-brand-100 bg-white text-brand-600 transition group-[.bg-brand-600]:border-white/20 group-[.bg-brand-600]:bg-white/10 group-[.bg-brand-600]:text-white dark:border-zinc-800 dark:bg-zinc-900 dark:text-brand-400 group-active:scale-95">

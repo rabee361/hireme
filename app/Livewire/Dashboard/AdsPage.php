@@ -16,6 +16,27 @@ class AdsPage extends Component
     #[Url(as: 'q', except: '')]
     public string $search = '';
 
+    public ?int $selectedItemId = null;
+
+    public function showItem(int $id): void
+    {
+        $this->selectedItemId = $id;
+    }
+
+    public function closeModal(): void
+    {
+        $this->selectedItemId = null;
+    }
+
+    #[\Livewire\Attributes\Computed]
+    public function selectedItem(): ?Ad
+    {
+        if (! $this->selectedItemId) {
+            return null;
+        }
+        return Ad::with('company')->withCount('applications')->find($this->selectedItemId);
+    }
+
     public function updatingSearch(): void
     {
         $this->resetPage();

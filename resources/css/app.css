@@ -117,15 +117,15 @@
     }
 
     .dashboard-input {
-        @apply w-full rounded-2xl border border-brand-100 bg-white/92 px-4 py-3 text-sm text-zinc-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none transition focus:border-brand-300 focus:ring-4 focus:ring-brand-100/80 dark:border-zinc-800 dark:bg-zinc-950/80 dark:text-zinc-300 dark:shadow-none dark:focus:border-brand-500/50 dark:focus:ring-brand-500/20;
+        @apply w-full rounded-2xl border border-brand-100 bg-white/92 px-4 py-3 text-sm text-zinc-700 placeholder:text-zinc-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none transition focus:border-brand-300 focus:ring-4 focus:ring-brand-100/80 dark:border-zinc-800 dark:bg-zinc-950/80 dark:text-zinc-300 dark:placeholder:text-zinc-500 dark:shadow-none dark:focus:border-brand-500/50 dark:focus:ring-brand-500/20;
     }
 
     .dashboard-table th {
-        @apply whitespace-nowrap px-5 py-4 text-right text-xs font-bold text-zinc-500;
+        @apply whitespace-nowrap px-5 py-4 text-right text-xs font-bold text-zinc-500 dark:text-zinc-400;
     }
 
     .dashboard-table td {
-        @apply whitespace-nowrap px-5 py-4 align-top text-sm text-zinc-700;
+        @apply whitespace-nowrap px-5 py-4 align-top text-sm text-zinc-700 dark:text-zinc-300;
     }
 }
 

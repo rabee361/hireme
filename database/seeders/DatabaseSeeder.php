@@ -25,5 +25,12 @@ class DatabaseSeeder extends Seeder
                 'password' => \Illuminate\Support\Facades\Hash::make('password'),
             ],
         );
+
+        $this->call([
+            UserSeeder::class,
+            AdSeeder::class,
+            ProjectSeeder::class,
+            NotificationSeeder::class,
+        ]);
     }
 }
