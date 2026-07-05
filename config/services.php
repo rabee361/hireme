@@ -45,7 +45,7 @@ return [
             $credentials = env('FIREBASE_CREDENTIALS');
 
             if (is_string($credentials) && $credentials !== '') {
-                return preg_match('/^(?:[A-Za-z]:[\\\\\/]|[\\\/])/', $credentials) === 1
+                return preg_match('#^(?:[A-Za-z]:[\\\\/]|[\\\\/])#', $credentials) === 1
                     ? $credentials
                     : base_path($credentials);
             }

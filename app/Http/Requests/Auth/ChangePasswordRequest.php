@@ -25,6 +25,7 @@ class ChangePasswordRequest extends FormRequest
             'email' => ['required', 'string', 'email'],
             'token' => ['required', 'string'],
             'password' => $this->passwordRules(),
+            'password_confirmation' => ['required', 'string'],
         ];
     }
 }

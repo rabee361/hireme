@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Profile\UpdateCustomerProfileRequest;
 use App\Models\Customer;
 use App\Models\CustomerProfile;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -62,6 +64,46 @@ class CustomerController extends Controller
 
         return response()->json([
             'message' => 'Customer retrieved successfully.',
+            'data' => $this->customerPayload($customer),
+        ]);
+    }
+
+    public function update(UpdateCustomerProfileRequest $request, Customer $customer): JsonResponse
+    {
+        $user = $request->user('api');
+
+        // Ensure the authenticated user is updating their own profile
+        abort_if(! $user || (int) $customer->id !== (int) $user->id, 403, 'This action is unauthorized.');
+
+        $validated = $request->validated();
+
+        // Separate user fields from profile fields
+        $userFields = array_intersect_key($validated, array_flip([
+            'username', 'phone_number', 'description', 'cover_image', 'avatar',
+        ]));
+
+        $profileFields = array_intersect_key($validated, array_flip([
+            'address', 'hour_cost', 'experience_years', 'tech1', 'tech2', 'tech3',
+            'college', 'title',
+        ]));
+
+        DB::transaction(function () use ($customer, $userFields, $profileFields): void {
+            if (! empty($userFields)) {
+                $customer->update($userFields);
+            }
+
+            if (! empty($profileFields)) {
+                $customer->profile()->updateOrCreate(
+                    ['user_id' => $customer->id],
+                    $profileFields
+                );
+            }
+        });
+
+        $customer->refresh()->load('profile');
+
+        return response()->json([
+            'message' => 'Customer profile updated successfully.',
             'data' => $this->customerPayload($customer),
         ]);
     }

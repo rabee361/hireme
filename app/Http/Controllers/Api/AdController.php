@@ -6,10 +6,10 @@ use App\Enums\UserType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Ads\StoreAdRequest;
 use App\Http\Requests\Ads\UpdateAdRequest;
+use App\Http\Resources\AdResource;
 use App\Models\Ad;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class AdController extends Controller
 {
@@ -24,35 +24,6 @@ class AdController extends Controller
         'cover_image',
     ];
 
-    /**
-     * @var array<int, string>
-     */
-    private const AD_PAYLOAD_FIELDS = [
-        'id',
-        'job_name',
-        'req1',
-        'req2',
-        'req3',
-        'req4',
-        'req5',
-        'task1',
-        'task2',
-        'task3',
-        'task4',
-        'task5',
-        'feature1',
-        'feature2',
-        'feature3',
-        'feature4',
-        'feature5',
-        'additional_details',
-        'github_required',
-        'resume_required',
-        'prev_work_required',
-        'expected_salary_required',
-        'company_id',
-    ];
-
     public function index(): JsonResponse
     {
         $ads = Ad::query()
@@ -63,7 +34,7 @@ class AdController extends Controller
 
         return response()->json([
             'message' => 'Ads retrieved successfully.',
-            'data' => $ads->map(fn (Ad $ad): array => $this->adPayload($ad))->all(),
+            'data' => AdResource::collection($ads),
         ]);
     }
 
@@ -78,7 +49,7 @@ class AdController extends Controller
 
         return response()->json([
             'message' => 'Ad created successfully.',
-            'data' => $this->adPayload($ad),
+            'data' => new AdResource($ad),
         ], 201);
     }
 
@@ -88,12 +59,20 @@ class AdController extends Controller
 
         return response()->json([
             'message' => 'Ad retrieved successfully.',
-            'data' => $this->adPayload($ad),
+            'data' => new AdResource($ad),
         ]);
     }
 
     public function update(UpdateAdRequest $request, Ad $ad): JsonResponse
     {
+        $user = $request->user('api');
+
+        abort_if(
+            ! $user || $user->type !== UserType::Company || (int) $ad->company_id !== (int) $user->id,
+            403,
+            'This action is unauthorized.'
+        );
+
         $ad->fill($request->validated());
         $ad->save();
 
@@ -101,7 +80,7 @@ class AdController extends Controller
 
         return response()->json([
             'message' => 'Ad updated successfully.',
-            'data' => $this->adPayload($ad),
+            'data' => new AdResource($ad),
         ]);
     }
 
@@ -122,46 +101,22 @@ class AdController extends Controller
         ]);
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    private function adPayload(Ad $ad): array
+    public function myAds(Request $request): JsonResponse
     {
-        $company = $ad->company;
-        $payload = $ad->only(self::AD_PAYLOAD_FIELDS);
+        $user = $request->user('api');
 
-        $payload['applicants_count'] = (int) ($ad->applications_count ?? 0);
-        $payload['company'] = [
-            'id' => $company?->id,
-            'name' => $company?->username,
-            'description' => $company?->description,
-            'image' => $company?->avatar ?? $company?->cover_image,
-        ];
-        $payload['since'] = $this->since($ad);
-        $payload['created_at'] = $ad->created_at?->toISOString();
-        $payload['updated_at'] = $ad->updated_at?->toISOString();
+        abort_if(! $user || $user->type !== UserType::Company, 403, 'This action is unauthorized.');
 
-        return $payload;
-    }
+        $ads = Ad::query()
+            ->where('company_id', $user->id)
+            ->with(['company:id,'.implode(',', array_slice(self::COMPANY_RELATION_COLUMNS, 1))])
+            ->withCount('applications')
+            ->latest()
+            ->get();
 
-    private function since(Ad $ad): ?string
-    {
-        if (! $ad->created_at) {
-            return null;
-        }
-
-        $days = $ad->created_at->diffInDays(now());
-
-        if ($days >= 1) {
-            return $days.' '.Str::plural('day', $days).' ago';
-        }
-
-        $hours = $ad->created_at->diffInHours(now());
-
-        if ($hours >= 1) {
-            return $hours.' '.Str::plural('hour', $hours).' ago';
-        }
-
-        return 'less than an hour ago';
+        return response()->json([
+            'message' => 'My ads retrieved successfully.',
+            'data' => AdResource::collection($ads),
+        ]);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\UserType;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -21,5 +22,11 @@ class Company extends TypedUser
     public function ads(): HasMany
     {
         return $this->hasMany(Ad::class, 'company_id');
+    }
+
+    public function savedStudents(): BelongsToMany
+    {
+        return $this->belongsToMany(Student::class, 'company_saved_students', 'company_id', 'student_id')
+            ->withTimestamps();
     }
 }
