@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Project extends Model
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Objection extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -14,17 +14,10 @@ class Project extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'details',
-        'tool1',
-        'tool2',
-        'tool3',
-        'tool4',
-        'tool5',
-        'name',
-        'cover_image',
         'customer_id',
+        'project_application_id',
+        'description',
         'status',
-        'delivery_days',
     ];
 
     public function customer(): BelongsTo
@@ -32,8 +25,8 @@ class Project extends Model
         return $this->belongsTo(User::class, 'customer_id');
     }
 
-    public function applications(): HasMany
+    public function projectApplication(): BelongsTo
     {
-        return $this->hasMany(ProjectApplication::class);
+        return $this->belongsTo(ProjectApplication::class);
     }
 }

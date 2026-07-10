@@ -18,12 +18,20 @@ class ProjectApplication extends Model
         'expected_salary',
         'resume',
         'project_id',
+        'status',
+        'client_approval_date',
+        'delivery_deadline_date',
+        'trial_ends_at_date',
+        'submission_link',
     ];
 
     protected function casts(): array
     {
         return [
             'expected_salary' => 'integer',
+            'client_approval_date' => 'datetime',
+            'delivery_deadline_date' => 'datetime',
+            'trial_ends_at_date' => 'datetime',
         ];
     }
 
@@ -35,5 +43,10 @@ class ProjectApplication extends Model
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
+    }
+
+    public function objections(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Objection::class);
     }
 }

@@ -12,6 +12,10 @@ use App\Http\Controllers\Api\PushNotificationController;
 use App\Http\Controllers\Api\SavedStudentController;
 use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\StudentSavedAdController;
+use App\Http\Controllers\Api\Admin\CompanyAdController;
+use App\Http\Controllers\Api\Admin\ClientAdController;
+use App\Http\Controllers\Api\Admin\AgreementController;
+use App\Http\Controllers\Api\Admin\ObjectionController as AdminObjectionController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -65,6 +69,10 @@ Route::middleware(['auth:api', 'jwt.access'])->group(function () {
     Route::get('ads/{ad}/applications', [AdApplicationController::class, 'index']);
     Route::get('projects/{project}/applications', [ProjectApplicationController::class, 'index']);
 
+    // Objections
+    Route::get('objections/eligible', [\App\Http\Controllers\Api\ObjectionController::class, 'eligible']);
+    Route::post('objections', [\App\Http\Controllers\Api\ObjectionController::class, 'store']);
+
     // Device tokens
     Route::get('device-tokens', [DeviceTokenController::class, 'index']);
     Route::post('device-tokens', [DeviceTokenController::class, 'store']);
@@ -73,4 +81,35 @@ Route::middleware(['auth:api', 'jwt.access'])->group(function () {
     // Push notifications
     Route::get('push-notifications', [PushNotificationController::class, 'index']);
     Route::patch('push-notifications/{pushNotificationRecipient}/read', [PushNotificationController::class, 'markAsRead']);
+
+    // Admin Routes
+    Route::prefix('admin')->group(function () {
+        // Company Ads
+        Route::get('company-ads/pending', [CompanyAdController::class, 'getPendingAds']);
+        Route::get('company-ads/approved', [CompanyAdController::class, 'getApprovedAds']);
+        Route::post('company-ads/{ad}/approve', [CompanyAdController::class, 'approveAd']);
+        Route::post('company-ads/{ad}/reject', [CompanyAdController::class, 'rejectAd']);
+        Route::delete('company-ads/{ad}', [CompanyAdController::class, 'deleteAd']);
+        Route::post('company-ads/applications/{application}/reminder', [CompanyAdController::class, 'sendReminder']);
+
+        // Client Ads
+        Route::get('client-ads/pending', [ClientAdController::class, 'getPendingProjects']);
+        Route::get('client-ads/approved', [ClientAdController::class, 'getApprovedProjects']);
+        Route::post('client-ads/{project}/approve', [ClientAdController::class, 'approveProject']);
+        Route::post('client-ads/{project}/reject', [ClientAdController::class, 'rejectProject']);
+        Route::delete('client-ads/{project}', [ClientAdController::class, 'deleteProject']);
+
+        // Agreements
+        Route::get('agreements', [AgreementController::class, 'index']);
+        Route::post('agreements/{application}/start', [AgreementController::class, 'startAgreement']);
+        Route::post('agreements/{application}/review', [AgreementController::class, 'reviewSubmission']);
+        Route::post('agreements/{application}/failed-delivery', [AgreementController::class, 'handleFailedDelivery']);
+        Route::post('agreements/{application}/finalize-trial', [AgreementController::class, 'finalizeTrial']);
+
+        // Objections
+        Route::get('objections', [AdminObjectionController::class, 'index']);
+        Route::post('objections/{objection}/accept', [AdminObjectionController::class, 'acceptObjection']);
+        Route::post('objections/{objection}/reject', [AdminObjectionController::class, 'rejectObjection']);
+        Route::post('objections/{objection}/review-fix', [AdminObjectionController::class, 'reviewFixSubmission']);
+    });
 });

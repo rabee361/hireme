@@ -37,6 +37,7 @@ class Ad extends Model
         'prev_work_required',
         'expected_salary_required',
         'company_id',
+        'status',
     ];
 
     protected function casts(): array

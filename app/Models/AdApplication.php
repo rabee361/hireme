@@ -18,6 +18,7 @@ class AdApplication extends Model
         'expected_salary',
         'resume',
         'ad_id',
+        'status',
     ];
 
     protected function casts(): array
