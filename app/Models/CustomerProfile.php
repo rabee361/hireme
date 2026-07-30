@@ -22,6 +22,11 @@ class CustomerProfile extends Model
         'tech3',
         'college',
         'title',
+        'git_link',
+        'linked_link',
+        'bio',
+        'university_name',
+        'is_graduated',
     ];
 
     protected function casts(): array

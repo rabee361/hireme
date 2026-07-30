@@ -40,6 +40,11 @@ class UpdateCustomerProfileRequest extends FormRequest
             'tech3' => ['sometimes', 'nullable', 'string', 'max:255'],
             'college' => ['sometimes', 'nullable', 'string', 'max:255'],
             'title' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'git_link' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'linked_link' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'bio' => ['sometimes', 'nullable', 'string'],
+            'university_name' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'is_graduated' => ['sometimes', 'nullable', 'boolean'],
         ];
     }
 }

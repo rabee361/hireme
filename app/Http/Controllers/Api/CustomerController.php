@@ -40,6 +40,11 @@ class CustomerController extends Controller
         'tech3',
         'college',
         'title',
+        'git_link',
+        'linked_link',
+        'bio',
+        'university_name',
+        'is_graduated',
     ];
 
     public function index(Request $request): JsonResponse
@@ -84,7 +89,7 @@ class CustomerController extends Controller
 
         $profileFields = array_intersect_key($validated, array_flip([
             'address', 'hour_cost', 'experience_years', 'tech1', 'tech2', 'tech3',
-            'college', 'title',
+            'college', 'title', 'git_link', 'linked_link', 'bio', 'university_name', 'is_graduated'
         ]));
 
         DB::transaction(function () use ($customer, $userFields, $profileFields): void {
