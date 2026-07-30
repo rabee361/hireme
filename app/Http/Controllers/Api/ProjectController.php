@@ -100,4 +100,23 @@ class ProjectController extends Controller
             'message' => 'Project deleted successfully.',
         ]);
     }
+
+    public function myProjects(Request $request): JsonResponse
+    {
+        $user = $request->user('api');
+
+        abort_if(! $user || $user->type !== UserType::Customer, 403, 'This action is unauthorized.');
+
+        $projects = Project::query()
+            ->where('customer_id', $user->id)
+            ->with(['customer:id,'.implode(',', array_slice(self::CUSTOMER_RELATION_COLUMNS, 1))])
+            ->withCount('applications')
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'message' => 'My projects retrieved successfully.',
+            'data' => ProjectResource::collection($projects),
+        ]);
+    }
 }

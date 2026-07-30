@@ -179,29 +179,21 @@ class AuthController extends Controller
     {
         $validated = $request->validated();
 
-        $status = Password::broker()->reset(
-            [
-                'email' => $validated['email'],
-                'token' => $validated['token'],
-                'password' => $validated['password'],
-                'password_confirmation' => $validated['password_confirmation'],
-            ],
-            function (User $user, string $password): void {
-                $user->forceFill([
-                    'password' => $password,
-                    'remember_token' => Str::random(60),
-                    'token_version' => $user->token_version + 1,
-                ])->save();
+        $user = User::query()->where('email', $validated['email'])->first();
 
-                event(new PasswordReset($user));
-            },
-        );
-
-        if ($status !== Password::PASSWORD_RESET) {
+        if (! $user) {
             return response()->json([
-                'message' => 'The password reset token is invalid or expired.',
-            ], 422);
+                'message' => 'User not found.',
+            ], 404);
         }
+
+        $user->forceFill([
+            'password' => $validated['password'],
+            'remember_token' => Str::random(60),
+            'token_version' => $user->token_version + 1,
+        ])->save();
+
+        event(new PasswordReset($user));
 
         return response()->json([
             'message' => 'Password changed successfully.',

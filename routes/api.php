@@ -47,6 +47,9 @@ Route::middleware(['auth:api', 'jwt.access'])->group(function () {
     // Company my-ads
     Route::get('my-ads', [AdController::class, 'myAds']);
 
+    // Customer my-projects
+    Route::get('my-projects', [ProjectController::class, 'myProjects']);
+
     // Saved students (company saves student)
     Route::get('saved-students', [SavedStudentController::class, 'index']);
     Route::post('saved-students/{student}', [SavedStudentController::class, 'store']);
