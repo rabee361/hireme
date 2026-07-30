@@ -14,6 +14,7 @@ class ProjectResource extends JsonResource
         'id',
         'name',
         'details',
+        'additional_details',
         'tool1',
         'tool2',
         'tool3',

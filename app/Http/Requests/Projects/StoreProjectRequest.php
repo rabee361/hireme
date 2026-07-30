@@ -20,11 +20,12 @@ class StoreProjectRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'details' => ['nullable', 'string'],
+            'additional_details' => ['nullable', 'string'],
             'tool1' => ['required', 'string', 'max:255'],
-            'tool2' => ['required', 'string', 'max:255'],
-            'tool3' => ['required', 'string', 'max:255'],
-            'tool4' => ['required', 'string', 'max:255'],
-            'tool5' => ['required', 'string', 'max:255'],
+            'tool2' => ['nullable', 'string', 'max:255'],
+            'tool3' => ['nullable', 'string', 'max:255'],
+            'tool4' => ['nullable', 'string', 'max:255'],
+            'tool5' => ['nullable', 'string', 'max:255'],
             'cover_image' => ['required', 'string', 'max:255'],
         ];
     }

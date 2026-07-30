@@ -23,6 +23,11 @@ class StudentProfile extends Model
         'tech3',
         'college',
         'title',
+        'git_link',
+        'linked_link',
+        'bio',
+        'university_name',
+        'is_graduated',
     ];
 
     protected function casts(): array
@@ -46,5 +51,10 @@ class StudentProfile extends Model
     public function projectApplications(): HasMany
     {
         return $this->hasMany(ProjectApplication::class);
+    }
+
+    public function experiences(): HasMany
+    {
+        return $this->hasMany(StudentExperience::class);
     }
 }

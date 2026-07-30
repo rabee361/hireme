@@ -40,6 +40,20 @@ class UpdateStudentProfileRequest extends FormRequest
             'tech3' => ['sometimes', 'nullable', 'string', 'max:255'],
             'college' => ['sometimes', 'nullable', 'string', 'max:255'],
             'title' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'git_link' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'linked_link' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'bio' => ['sometimes', 'nullable', 'string'],
+            'university_name' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'is_graduated' => ['sometimes', 'nullable', 'boolean'],
+
+            // experiences
+            'experiences' => ['sometimes', 'nullable', 'array'],
+            'experiences.*.exp_name' => ['required_with:experiences', 'string', 'max:255'],
+            'experiences.*.is_freelancer' => ['required_with:experiences', 'boolean'],
+            'experiences.*.job_title' => ['required_with:experiences', 'string', 'max:255'],
+            'experiences.*.start_date' => ['required_with:experiences', 'string', 'max:50'],
+            'experiences.*.end_date' => ['nullable', 'string', 'max:50'],
+            'experiences.*.until_now' => ['required_with:experiences', 'boolean'],
         ];
     }
 }

@@ -13,6 +13,7 @@ class AdResource extends JsonResource
     private const AD_PAYLOAD_FIELDS = [
         'id',
         'job_name',
+        'description',
         'req1',
         'req2',
         'req3',

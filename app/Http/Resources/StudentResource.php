@@ -32,6 +32,11 @@ class StudentResource extends JsonResource
         'tech3',
         'college',
         'title',
+        'git_link',
+        'linked_link',
+        'bio',
+        'university_name',
+        'is_graduated',
     ];
 
     /**
@@ -58,6 +63,7 @@ class StudentResource extends JsonResource
         }
 
         $payload = $profile->only(self::PROFILE_FIELDS);
+        $payload['experiences'] = $profile->experiences ?? [];
         $payload['created_at'] = $profile->created_at?->toISOString();
         $payload['updated_at'] = $profile->updated_at?->toISOString();
 

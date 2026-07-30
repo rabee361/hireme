@@ -15,6 +15,7 @@ class Project extends Model
      */
     protected $fillable = [
         'details',
+        'additional_details',
         'tool1',
         'tool2',
         'tool3',

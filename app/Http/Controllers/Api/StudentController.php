@@ -17,7 +17,7 @@ class StudentController extends Controller
         $name = trim((string) $request->query('name', ''));
 
         $students = Student::query()
-            ->with('profile')
+            ->with('profile.experiences')
             ->when($name !== '', fn ($query) => $query->where('username', 'like', "%{$name}%"))
             ->latest()
             ->get();
@@ -30,7 +30,7 @@ class StudentController extends Controller
 
     public function show(Student $student): JsonResponse
     {
-        $student->load('profile');
+        $student->load('profile.experiences');
 
         return response()->json([
             'message' => 'Student retrieved successfully.',
@@ -54,10 +54,12 @@ class StudentController extends Controller
 
         $profileFields = array_intersect_key($validated, array_flip([
             'address', 'hour_cost', 'experience_years', 'tech1', 'tech2', 'tech3',
-            'college', 'title',
+            'college', 'title', 'git_link', 'linked_link', 'bio', 'university_name', 'is_graduated'
         ]));
 
-        DB::transaction(function () use ($student, $userFields, $profileFields): void {
+        $experiences = $validated['experiences'] ?? null;
+
+        DB::transaction(function () use ($student, $userFields, $profileFields, $experiences): void {
             if (! empty($userFields)) {
                 $student->update($userFields);
             }
@@ -68,9 +70,17 @@ class StudentController extends Controller
                     $profileFields
                 );
             }
+
+            if ($experiences !== null) {
+                $profile = $student->profile()->firstOrCreate(['user_id' => $student->id]);
+                $profile->experiences()->delete();
+                if (! empty($experiences)) {
+                    $profile->experiences()->createMany($experiences);
+                }
+            }
         });
 
-        $student->refresh()->load('profile');
+        $student->refresh()->load('profile.experiences');
 
         return response()->json([
             'message' => 'Student profile updated successfully.',

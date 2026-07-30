@@ -16,6 +16,7 @@ class Ad extends Model
      */
     protected $fillable = [
         'job_name',
+        'description',
         'req1',
         'req2',
         'req3',

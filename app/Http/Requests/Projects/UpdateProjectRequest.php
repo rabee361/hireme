@@ -26,11 +26,12 @@ class UpdateProjectRequest extends FormRequest
         return [
             'name' => ['sometimes', 'required', 'string', 'max:255'],
             'details' => ['sometimes', 'nullable', 'string'],
+            'additional_details' => ['sometimes', 'nullable', 'string'],
             'tool1' => ['sometimes', 'required', 'string', 'max:255'],
-            'tool2' => ['sometimes', 'required', 'string', 'max:255'],
-            'tool3' => ['sometimes', 'required', 'string', 'max:255'],
-            'tool4' => ['sometimes', 'required', 'string', 'max:255'],
-            'tool5' => ['sometimes', 'required', 'string', 'max:255'],
+            'tool2' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'tool3' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'tool4' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'tool5' => ['sometimes', 'nullable', 'string', 'max:255'],
             'cover_image' => ['sometimes', 'required', 'string', 'max:255'],
         ];
     }

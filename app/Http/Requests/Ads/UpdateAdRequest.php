@@ -25,6 +25,7 @@ class UpdateAdRequest extends FormRequest
     {
         return [
             'job_name' => ['sometimes', 'required', 'string', 'max:255'],
+            'description' => ['sometimes', 'required', 'string'],
             'req1' => ['sometimes', 'required', 'string', 'max:255'],
             'req2' => ['sometimes', 'nullable', 'string', 'max:255'],
             'req3' => ['sometimes', 'nullable', 'string', 'max:255'],

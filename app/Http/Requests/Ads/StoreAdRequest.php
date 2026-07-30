@@ -19,6 +19,7 @@ class StoreAdRequest extends FormRequest
     {
         return [
             'job_name' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string'],
             'req1' => ['required', 'string', 'max:255'],
             'req2' => ['nullable', 'string', 'max:255'],
             'req3' => ['nullable', 'string', 'max:255'],
