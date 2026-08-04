@@ -157,4 +157,65 @@ class AdApplicationController extends Controller
             'message' => 'Ad application deleted successfully.',
         ]);
     }
+
+    /**
+     * Accept a student's ad application (Company only).
+     */
+    public function acceptApplication(Request $request, AdApplication $adApplication): JsonResponse
+    {
+        $user = $request->user('api');
+        $ad = $adApplication->ad;
+
+        abort_if(
+            ! $user || $user->type !== UserType::Company || (int) $ad->company_id !== (int) $user->id,
+            403,
+            'This action is unauthorized.'
+        );
+
+        if ($adApplication->status !== 'pending') {
+            return response()->json(['message' => 'Application is not pending.'], 400);
+        }
+
+        $adApplication->update(['status' => 'accepted']);
+
+        $studentUser = $adApplication->studentProfile->user;
+        $companyUser = $ad->company;
+
+        app(\App\Services\AdminNotificationService::class)->studentAdApplicationAccepted(
+            $studentUser,
+            $companyUser->name ?? $companyUser->username ?? 'Company',
+            $ad->job_name
+        );
+
+        return response()->json([
+            'message' => 'Application accepted successfully.',
+            'data' => new AdApplicationResource($adApplication->refresh()),
+        ]);
+    }
+
+    /**
+     * Reject a student's ad application (Company only).
+     */
+    public function rejectApplication(Request $request, AdApplication $adApplication): JsonResponse
+    {
+        $user = $request->user('api');
+        $ad = $adApplication->ad;
+
+        abort_if(
+            ! $user || $user->type !== UserType::Company || (int) $ad->company_id !== (int) $user->id,
+            403,
+            'This action is unauthorized.'
+        );
+
+        if ($adApplication->status !== 'pending') {
+            return response()->json(['message' => 'Application is not pending.'], 400);
+        }
+
+        $adApplication->update(['status' => 'rejected']);
+
+        return response()->json([
+            'message' => 'Application rejected successfully.',
+            'data' => new AdApplicationResource($adApplication->refresh()),
+        ]);
+    }
 }

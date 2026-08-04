@@ -157,4 +157,101 @@ class ProjectApplicationController extends Controller
             'message' => 'Project application deleted successfully.',
         ]);
     }
+
+    /**
+     * Accept a student's project application (Customer only).
+     */
+    public function acceptApplication(Request $request, ProjectApplication $projectApplication): JsonResponse
+    {
+        $user = $request->user('api');
+        $project = $projectApplication->project;
+
+        abort_if(
+            ! $user || $user->type !== UserType::Customer || (int) $project->customer_id !== (int) $user->id,
+            403,
+            'This action is unauthorized.'
+        );
+
+        if ($projectApplication->status !== 'pending' && $projectApplication->status !== 'not_assigned') {
+            return response()->json(['message' => 'Application is not pending.'], 400);
+        }
+
+        $projectApplication->update(['status' => 'accepted_by_client']);
+
+        $studentUser = $projectApplication->studentProfile->user;
+        $customerUser = $project->customer;
+
+        app(\App\Services\AdminNotificationService::class)->studentAgreementStarted(
+            $studentUser,
+            $customerUser->name ?? $customerUser->username ?? 'Client',
+            $project->name,
+            ($projectApplication->expected_salary ?? '0') . ' $'
+        );
+
+        return response()->json([
+            'message' => 'Application accepted successfully.',
+            'data' => new ProjectApplicationResource($projectApplication->refresh()),
+        ]);
+    }
+
+    /**
+     * Reject a student's project application (Customer only).
+     */
+    public function rejectApplication(Request $request, ProjectApplication $projectApplication): JsonResponse
+    {
+        $user = $request->user('api');
+        $project = $projectApplication->project;
+
+        abort_if(
+            ! $user || $user->type !== UserType::Customer || (int) $project->customer_id !== (int) $user->id,
+            403,
+            'This action is unauthorized.'
+        );
+
+        if ($projectApplication->status !== 'pending' && $projectApplication->status !== 'not_assigned') {
+            return response()->json(['message' => 'Application is not pending.'], 400);
+        }
+
+        $projectApplication->update(['status' => 'rejected']);
+
+        return response()->json([
+            'message' => 'Application rejected successfully.',
+            'data' => new ProjectApplicationResource($projectApplication->refresh()),
+        ]);
+    }
+
+    /**
+     * Get the list of accepted project applications for the customer.
+     */
+    public function receivedProjects(Request $request): JsonResponse
+    {
+        $user = $request->user('api');
+
+        abort_if(
+            ! $user || $user->type !== UserType::Customer,
+            403,
+            'This action is unauthorized.'
+        );
+
+        $eligibleApplications = ProjectApplication::whereHas('project', function ($query) use ($user) {
+            $query->where('customer_id', $user->id);
+        })
+        ->whereIn('status', ['accepted_by_client', 'in_progress', 'delivered_to_admin', 'delivered_to_customer', 'completed'])
+        ->with(['project', 'studentProfile.user'])
+        ->latest()
+        ->get()
+        ->map(function ($application) {
+            $studentUser = $application->studentProfile->user;
+            return [
+                'application_id' => $application->id,
+                'project_name' => $application->project->name,
+                'student_name' => $studentUser ? ($studentUser->name ?? $studentUser->username) : null,
+                'status' => $application->status,
+            ];
+        });
+
+        return response()->json([
+            'data' => $eligibleApplications
+        ]);
+    }
 }

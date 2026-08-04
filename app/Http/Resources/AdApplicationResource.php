@@ -21,6 +21,7 @@ class AdApplicationResource extends JsonResource
             'github_link' => $this->github_link,
             'expected_salary' => $this->expected_salary,
             'resume' => $this->resume,
+            'status' => $this->status,
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
             'student' => $this->whenLoaded('studentProfile', function () {

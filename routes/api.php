@@ -49,6 +49,7 @@ Route::middleware(['auth:api', 'jwt.access'])->group(function () {
 
     // Customer my-projects
     Route::get('my-projects', [ProjectController::class, 'myProjects']);
+    Route::get('customer/received-projects', [ProjectApplicationController::class, 'receivedProjects']);
 
     // Saved students (company saves student)
     Route::get('saved-students', [SavedStudentController::class, 'index']);
@@ -66,7 +67,12 @@ Route::middleware(['auth:api', 'jwt.access'])->group(function () {
 
     // Ad & Project application CRUD
     Route::apiResource('ad-applications', AdApplicationController::class)->only(['store', 'update', 'destroy']);
+    Route::post('ad-applications/{adApplication}/accept', [AdApplicationController::class, 'acceptApplication']);
+    Route::post('ad-applications/{adApplication}/reject', [AdApplicationController::class, 'rejectApplication']);
+
     Route::apiResource('project-applications', ProjectApplicationController::class)->only(['store', 'update', 'destroy']);
+    Route::post('project-applications/{projectApplication}/accept', [ProjectApplicationController::class, 'acceptApplication']);
+    Route::post('project-applications/{projectApplication}/reject', [ProjectApplicationController::class, 'rejectApplication']);
 
     // Company/Customer review applications for their ads/projects
     Route::get('ads/{ad}/applications', [AdApplicationController::class, 'index']);

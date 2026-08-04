@@ -42,6 +42,12 @@ class AdminNotificationService
         $this->send($company, 'company', $content);
     }
 
+    public function studentAdApplicationAccepted(User $student, string $companyName, string $jobName)
+    {
+        $content = "تهانينا ! لقد تم قبول طلبك من قبل شركة {$companyName} وذلك لإجراء مقابلة العمل الخاصة بالمسمى الوظيفي \"{$jobName}\" ابقى متحمسا سوف يتم التواصل معك قريبا على ايميلك لتحديد موعد المقابلة.";
+        $this->send($student, 'student', $content);
+    }
+
     // ==========================================
     // Client Ads / Projects Notifications
     // ==========================================
